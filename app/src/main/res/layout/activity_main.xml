@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:padding="10dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ViewFlipper
+            android:id="@+id/viewFlipper"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:id="@+id/homepage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="visible">
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/trainWorkoutButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:contentDescription="Train a new workout"
+                    app:backgroundTint="@color/white"
+                    app:rippleColor="@color/purple_200"
+                    app:srcCompat="@drawable/model_training"
+                    tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:id="@+id/fitnessOptionsDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Your workouts"
+                    android:textAlignment="center"
+                    android:textSize="18sp"
+                    tools:ignore="HardcodedText" />
+
+                <Button
+                    android:id="@+id/defaultSquatButton"
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="Squats"
+                    android:textAlignment="center"
+                    app:icon="@drawable/fitness_center"
+                    tools:ignore="HardcodedText" />
+
+                <Button
+                    android:id="@+id/defaultPushupButton"
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="Push ups"
+                    app:icon="@drawable/fitness_center"
+                    tools:ignore="HardcodedText" />
+            </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/cameraLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <androidx.camera.view.PreviewView
+                    android:id="@+id/camera"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+                <com.example.fitnessform.camera.Skeleton
+                    android:id="@+id/skeleton"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+                <ImageButton
+                    android:id="@+id/openHomepageButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:contentDescription="Go back to home"
+                    android:src="@drawable/home"
+                    android:text="Open Home Page"
+                    tools:ignore="HardcodedText" />
+
+            </RelativeLayout>
+
+        </ViewFlipper>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
