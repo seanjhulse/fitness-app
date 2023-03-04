@@ -98,16 +98,6 @@ public class Skeleton extends View
         postInvalidate();
     }
 
-    public int getImageWidth()
-    {
-        return imageWidth;
-    }
-
-    public int getImageHeight()
-    {
-        return imageHeight;
-    }
-
     public boolean isImageFlipped()
     {
         return isImageFlipped;
