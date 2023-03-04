@@ -9,7 +9,7 @@ import android.widget.ViewFlipper;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.fitnessform.camera.CameraHelper;
+import com.example.fitnessform.camera.CameraManager;
 import com.example.fitnessform.databinding.ActivityMainBinding;
 import com.google.android.material.button.MaterialButton;
 
@@ -18,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
     private ViewFlipper viewFlipper;
     private View cameraLayout;
     private View homePage;
-    private CameraHelper cameraHelper;
+    private CameraManager cameraManager;
     private Context applicationContext;
     private ActivityMainBinding binding;
 
@@ -43,15 +43,15 @@ public class MainActivity extends AppCompatActivity {
 
     public void openCamera(View listener) {
         viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(cameraLayout));
-        if (cameraHelper == null) {
-            cameraHelper = new CameraHelper(this, applicationContext, binding.camera, binding.skeleton);
-            cameraHelper.start();
+        if (cameraManager == null) {
+            cameraManager = new CameraManager(this, applicationContext, binding.camera, binding.skeleton);
+            cameraManager.start();
         }
     }
 
     public void openHomepage(View listener) {
         viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(homePage));
-        cameraHelper.stop();
-        cameraHelper = null;
+        cameraManager.stop();
+        cameraManager = null;
     }
 }
