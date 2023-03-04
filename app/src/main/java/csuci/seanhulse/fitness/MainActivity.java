@@ -9,10 +9,11 @@ import android.widget.ViewFlipper;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import csuci.seanhulse.fitness.camera.CameraManager;
-import com.example.fitness.databinding.ActivityMainBinding;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import csuci.seanhulse.fitness.camera.CameraManager;
+import csuci.seanhulse.fitness.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
     private ViewFlipper viewFlipper;
