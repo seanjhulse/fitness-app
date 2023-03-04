@@ -19,14 +19,12 @@ import csuci.seanhulse.fitness.db.PoseDatabase;
 
 public class Analyzer implements ImageAnalysis.Analyzer {
 
-    private final Skeleton skeleton;
     private final PoseDetector poseDetector;
     private final boolean isImageFlipped;
     private final PoseDataManager poseDataManager;
     private final PoseDatabase db;
 
-    public Analyzer(Skeleton skeleton, Context context, PoseDataManager poseDataManager, boolean isImageFlipped) {
-        this.skeleton = skeleton;
+    public Analyzer(Context context, PoseDataManager poseDataManager, boolean isImageFlipped) {
         this.poseDataManager = poseDataManager;
         this.isImageFlipped = isImageFlipped;
 
@@ -51,9 +49,9 @@ public class Analyzer implements ImageAnalysis.Analyzer {
             InputImage image = InputImage.fromMediaImage(mediaImage, rotationDegrees);
 
             if (rotationDegrees == 0 || rotationDegrees == 180) {
-                skeleton.setImageSourceInfo(imageProxy.getWidth(), imageProxy.getHeight(), isImageFlipped);
+                poseDataManager.setImageSourceInfo(imageProxy.getWidth(), imageProxy.getHeight(), isImageFlipped);
             } else {
-                skeleton.setImageSourceInfo(imageProxy.getHeight(), imageProxy.getWidth(), isImageFlipped);
+                poseDataManager.setImageSourceInfo(imageProxy.getHeight(), imageProxy.getWidth(), isImageFlipped);
             }
 
             // Pass image to an ML Kit Vision API

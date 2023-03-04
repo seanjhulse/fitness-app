@@ -33,17 +33,15 @@ public class CameraManager {
     private final AppCompatActivity owner;
     private final PreviewView cameraView;
     private final Context context;
-    private final Skeleton skeleton;
     private final ExecutorService cameraExecutor = Executors.newSingleThreadExecutor();
     private final PoseDataManager poseDataManager;
 
     private ProcessCameraProvider cameraProvider;
 
-    public CameraManager(AppCompatActivity owner, Context context, PreviewView cameraView, Skeleton skeleton, PoseDataManager poseDataManager) {
+    public CameraManager(AppCompatActivity owner, Context context, PreviewView cameraView, PoseDataManager poseDataManager) {
         this.owner = owner;
         this.context = context;
         this.cameraView = cameraView;
-        this.skeleton = skeleton;
         this.poseDataManager = poseDataManager;
     }
 
@@ -103,7 +101,7 @@ public class CameraManager {
 
     private UseCase createImageAnalysisUseCase() {
         ImageAnalysis analyzer = new ImageAnalysis.Builder().build();
-        analyzer.setAnalyzer(cameraExecutor, new Analyzer(skeleton, context, poseDataManager, true));
+        analyzer.setAnalyzer(cameraExecutor, new Analyzer(context, poseDataManager, true));
         return analyzer;
     }
 

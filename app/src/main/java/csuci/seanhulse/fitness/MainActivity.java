@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
     public void openCamera(View listener) {
         viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(cameraLayout));
         if (cameraManager == null || cameraManager.isShutdown()) {
-            cameraManager = new CameraManager(this, applicationContext, binding.camera, binding.skeleton, poseDataManager);
+            cameraManager = new CameraManager(this, applicationContext, binding.camera, poseDataManager);
             cameraManager.start();
         }
     }

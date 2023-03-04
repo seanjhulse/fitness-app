@@ -90,6 +90,7 @@ public class Skeleton extends View implements IPoseDataListener
      * @param imageHeight the height of the image sent to ML Kit detectors
      * @param isFlipped   whether the image is flipped. Should set it to true when the image is from the front camera.
      */
+    @Override
     public void setImageSourceInfo(int imageWidth, int imageHeight, boolean isFlipped)
     {
         synchronized (lock)

@@ -34,6 +34,11 @@ public class PoseDataManager {
         poses.clear();
     }
 
+    public void setImageSourceInfo(int imageWidth, int imageHeight, boolean isFlipped)
+    {
+        listeners.forEach(listener -> listener.setImageSourceInfo(imageWidth, imageHeight, isFlipped));
+    }
+
     public void addPoseDataListener(IPoseDataListener listener) {
         if (listener != null) {
             listeners.add(listener);
