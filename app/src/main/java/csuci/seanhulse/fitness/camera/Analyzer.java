@@ -17,6 +17,11 @@ import com.google.mlkit.vision.pose.accurate.AccuratePoseDetectorOptions;
 import csuci.seanhulse.fitness.data.PoseDataManager;
 import csuci.seanhulse.fitness.db.PoseDatabase;
 
+/**
+ * Image Analysis Analyzer which uses Google's Pose Detection ML API for detecting a human pose.
+ *
+ * @since 1.0.0
+ */
 public class Analyzer implements ImageAnalysis.Analyzer {
 
     private final PoseDetector poseDetector;

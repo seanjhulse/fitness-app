@@ -26,6 +26,8 @@ import csuci.seanhulse.fitness.data.PoseDataManager;
 
 /**
  * Manages the camera authorization, processes, and aspect ratio.
+ *
+ * @since 1.0.0
  */
 public class CameraManager {
     private final static int REQUEST_CODE_PERMISSIONS = 42;

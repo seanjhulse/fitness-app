@@ -15,6 +15,8 @@ import csuci.seanhulse.fitness.data.IPoseDataListener;
 
 /**
  * An overlay for showing the human skeleton on top of the Camera Preview.
+ *
+ * @since 1.0.0
  */
 public class Skeleton extends View implements IPoseDataListener
 {
