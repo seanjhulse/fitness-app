@@ -13,6 +13,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import csuci.seanhulse.fitness.camera.CameraManager;
+import csuci.seanhulse.fitness.data.PoseDataManager;
 import csuci.seanhulse.fitness.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
@@ -22,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
     private CameraManager cameraManager;
     private Context applicationContext;
     private ActivityMainBinding binding;
+    private final PoseDataManager poseDataManager = new PoseDataManager();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,12 +46,22 @@ public class MainActivity extends AppCompatActivity {
         FloatingActionButton trainWorkoutButton = viewFlipper.findViewById(R.id.trainWorkoutButton);
         trainWorkoutButton.setOnClickListener(this::openCamera);
 
+        // Add the Skeleton class as a listener for the Pose Data Manager
+        poseDataManager.addPoseDataListener(binding.skeleton);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        // Clear all the Pose Data Listeners
+        poseDataManager.clearPoseDataListeners();
     }
 
     public void openCamera(View listener) {
         viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(cameraLayout));
         if (cameraManager == null || cameraManager.isShutdown()) {
-            cameraManager = new CameraManager(this, applicationContext, binding.camera, binding.skeleton);
+            cameraManager = new CameraManager(this, applicationContext, binding.camera, binding.skeleton, poseDataManager);
             cameraManager.start();
         }
     }

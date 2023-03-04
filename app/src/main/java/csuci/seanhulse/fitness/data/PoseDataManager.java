@@ -1,0 +1,43 @@
+package csuci.seanhulse.fitness.data;
+
+import com.google.mlkit.vision.pose.Pose;
+
+import java.util.Collection;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+/**
+ * Singleton class for storing and accessing Pose Landmark data.
+ */
+public class PoseDataManager {
+    private final Collection<IPoseDataListener> listeners = new CopyOnWriteArrayList<>();
+    private final Queue<Pose> poses = new ConcurrentLinkedQueue<>();
+
+    public void addPose(Pose pose) {
+        if (pose != null) {
+            poses.add(pose);
+
+            // Inform each listener that the Pose has been added
+            listeners.forEach(listener -> listener.poseAdded(pose));
+        }
+    }
+
+    public Pose getPose() {
+        return poses.peek();
+    }
+
+    public void clear() {
+        poses.clear();
+    }
+
+    public void addPoseDataListener(IPoseDataListener listener) {
+        if (listener != null) {
+            listeners.add(listener);
+        }
+    }
+
+    public void clearPoseDataListeners() {
+        listeners.clear();
+    }
+}

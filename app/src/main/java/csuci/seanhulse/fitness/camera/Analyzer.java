@@ -9,21 +9,25 @@ import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageProxy;
 import androidx.room.Room;
 
-import csuci.seanhulse.fitness.db.PoseDatabase;
 import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.pose.PoseDetection;
 import com.google.mlkit.vision.pose.PoseDetector;
 import com.google.mlkit.vision.pose.accurate.AccuratePoseDetectorOptions;
+
+import csuci.seanhulse.fitness.data.PoseDataManager;
+import csuci.seanhulse.fitness.db.PoseDatabase;
 
 public class Analyzer implements ImageAnalysis.Analyzer {
 
     private final Skeleton skeleton;
     private final PoseDetector poseDetector;
     private final boolean isImageFlipped;
+    private final PoseDataManager poseDataManager;
     private final PoseDatabase db;
 
-    public Analyzer(Skeleton skeleton, Context context, boolean isImageFlipped) {
+    public Analyzer(Skeleton skeleton, Context context, PoseDataManager poseDataManager, boolean isImageFlipped) {
         this.skeleton = skeleton;
+        this.poseDataManager = poseDataManager;
         this.isImageFlipped = isImageFlipped;
 
         AccuratePoseDetectorOptions poseDetectorOptions = new AccuratePoseDetectorOptions.Builder()
@@ -55,15 +59,7 @@ public class Analyzer implements ImageAnalysis.Analyzer {
             // Pass image to an ML Kit Vision API
             poseDetector.process(image)
                     .addOnSuccessListener(pose -> {
-                                PoseGraphic graphic = new PoseGraphic(skeleton, pose,
-                                        true,
-                                        true,
-                                        true,
-                                        pose.getAllPoseLandmarks());
-
-                                skeleton.clear();
-                                skeleton.add(graphic);
-                                skeleton.postInvalidate();
+                                poseDataManager.addPose(pose);
                                 try {
                                     imageProxy.close();
                                 } catch (Exception e) {

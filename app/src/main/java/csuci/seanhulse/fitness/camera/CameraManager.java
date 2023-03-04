@@ -22,6 +22,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import csuci.seanhulse.fitness.data.PoseDataManager;
+
 /**
  * Manages the camera authorization, processes, and aspect ratio.
  */
@@ -33,14 +35,16 @@ public class CameraManager {
     private final Context context;
     private final Skeleton skeleton;
     private final ExecutorService cameraExecutor = Executors.newSingleThreadExecutor();
+    private final PoseDataManager poseDataManager;
 
     private ProcessCameraProvider cameraProvider;
 
-    public CameraManager(AppCompatActivity owner, Context context, PreviewView cameraView, Skeleton skeleton) {
+    public CameraManager(AppCompatActivity owner, Context context, PreviewView cameraView, Skeleton skeleton, PoseDataManager poseDataManager) {
         this.owner = owner;
         this.context = context;
         this.cameraView = cameraView;
         this.skeleton = skeleton;
+        this.poseDataManager = poseDataManager;
     }
 
     public void start() {
@@ -99,7 +103,7 @@ public class CameraManager {
 
     private UseCase createImageAnalysisUseCase() {
         ImageAnalysis analyzer = new ImageAnalysis.Builder().build();
-        analyzer.setAnalyzer(cameraExecutor, new Analyzer(skeleton, context, true));
+        analyzer.setAnalyzer(cameraExecutor, new Analyzer(skeleton, context, poseDataManager, true));
         return analyzer;
     }
 
@@ -109,8 +113,5 @@ public class CameraManager {
                 .setCameraSelector(cameraSelector)
                 .setTargetAspectRatio(AspectRatio.RATIO_16_9)
                 .build();
-    }
-
-    public void startTraining() {
     }
 }

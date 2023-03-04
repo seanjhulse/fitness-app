@@ -6,13 +6,17 @@ import android.graphics.Matrix;
 import android.util.AttributeSet;
 import android.view.View;
 
+import com.google.mlkit.vision.pose.Pose;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import csuci.seanhulse.fitness.data.IPoseDataListener;
 
 /**
  * An overlay for showing the human skeleton on top of the Camera Preview.
  */
-public class Skeleton extends View
+public class Skeleton extends View implements IPoseDataListener
 {
     private final Object lock = new Object();
     private final List<Graphic> graphics = new ArrayList<>();
@@ -179,5 +183,19 @@ public class Skeleton extends View
                 graphic.draw(canvas);
             }
         }
+    }
+
+    @Override
+    public void poseAdded(Pose pose) {
+        PoseGraphic graphic = new PoseGraphic(this, pose,
+                true,
+                true,
+                true,
+                pose.getAllPoseLandmarks());
+
+        clear();
+        add(graphic);
+        postInvalidate();
+
     }
 }
