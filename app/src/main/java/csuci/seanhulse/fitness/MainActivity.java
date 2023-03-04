@@ -1,4 +1,4 @@
-package com.example.fitnessform;
+package csuci.seanhulse.fitness;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -9,8 +9,8 @@ import android.widget.ViewFlipper;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.fitnessform.camera.CameraManager;
-import com.example.fitnessform.databinding.ActivityMainBinding;
+import csuci.seanhulse.fitness.camera.CameraManager;
+import com.example.fitness.databinding.ActivityMainBinding;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 

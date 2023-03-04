@@ -1,4 +1,4 @@
-package com.example.fitnessform;
+package csuci.seanhulse.fitness;
 
 import org.junit.Test;
 

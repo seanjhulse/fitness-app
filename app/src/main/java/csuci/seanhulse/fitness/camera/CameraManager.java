@@ -1,10 +1,9 @@
-package com.example.fitnessform.camera;
+package csuci.seanhulse.fitness.camera;
 
 import android.Manifest.permission;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.AspectRatio;

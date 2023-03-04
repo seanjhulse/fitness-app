@@ -6,7 +6,7 @@ android {
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.example.fitnessform"
+        applicationId "csuci.seanhulse.fitness"
         minSdk 28
         targetSdk 33
         versionCode 1
@@ -36,7 +36,7 @@ android {
     buildFeatures {
         dataBinding true
     }
-    namespace 'com.example.fitnessform'
+    namespace 'csuci.seanhulse.fitness'
 
 }
 
