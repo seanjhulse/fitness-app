@@ -71,7 +71,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
 
-                <csuci.seanhulse.fitness.camera.Skeleton
+                <csuci.seanhulse.fitness.skeleton.Skeleton
                     android:id="@+id/skeleton"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />

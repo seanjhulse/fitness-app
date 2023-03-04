@@ -1,4 +1,4 @@
-package csuci.seanhulse.fitness.camera;
+package csuci.seanhulse.fitness.skeleton;
 
 import android.content.Context;
 import android.graphics.Canvas;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package csuci.seanhulse.fitness.camera;
+package csuci.seanhulse.fitness.skeleton;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
