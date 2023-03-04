@@ -58,6 +58,7 @@
                     android:text="Push ups"
                     app:icon="@drawable/fitness_center"
                     tools:ignore="HardcodedText" />
+
             </LinearLayout>
 
             <RelativeLayout

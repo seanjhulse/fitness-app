@@ -12,9 +12,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.fitnessform.camera.CameraManager;
 import com.example.fitnessform.databinding.ActivityMainBinding;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class MainActivity extends AppCompatActivity {
-
     private ViewFlipper viewFlipper;
     private View cameraLayout;
     private View homePage;
@@ -36,14 +36,18 @@ public class MainActivity extends AppCompatActivity {
 
         MaterialButton defaultSquatButton = viewFlipper.findViewById(R.id.defaultSquatButton);
         defaultSquatButton.setOnClickListener(this::openCamera);
+
         ImageButton openHomepageButton = viewFlipper.findViewById(R.id.openHomepageButton);
         openHomepageButton.setOnClickListener(this::openHomepage);
+
+        FloatingActionButton trainWorkoutButton = viewFlipper.findViewById(R.id.trainWorkoutButton);
+        trainWorkoutButton.setOnClickListener(this::openCamera);
 
     }
 
     public void openCamera(View listener) {
         viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(cameraLayout));
-        if (cameraManager == null) {
+        if (cameraManager == null || cameraManager.isShutdown()) {
             cameraManager = new CameraManager(this, applicationContext, binding.camera, binding.skeleton);
             cameraManager.start();
         }
@@ -52,6 +56,5 @@ public class MainActivity extends AppCompatActivity {
     public void openHomepage(View listener) {
         viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(homePage));
         cameraManager.stop();
-        cameraManager = null;
     }
 }

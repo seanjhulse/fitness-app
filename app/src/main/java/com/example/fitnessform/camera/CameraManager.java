@@ -4,6 +4,7 @@ import android.Manifest.permission;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.AspectRatio;
@@ -53,6 +54,10 @@ public class CameraManager {
 
     public void stop() {
         cameraExecutor.shutdown();
+    }
+
+    public boolean isShutdown() {
+        return cameraExecutor.isShutdown();
     }
 
     private void startCamera() {
@@ -107,4 +112,6 @@ public class CameraManager {
                 .build();
     }
 
+    public void startTraining() {
+    }
 }
