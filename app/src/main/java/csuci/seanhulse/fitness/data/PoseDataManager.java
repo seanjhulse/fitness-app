@@ -8,7 +8,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * Singleton class for storing and accessing Pose Landmark data.
+ * Singleton class for storing and accessing Pose Landmark data. {@link IPoseDataListener}s will
+ * receive any changes to the Pose Data.
+ *
+ * @since 1.0.0
  */
 public class PoseDataManager {
     private final Collection<IPoseDataListener> listeners = new CopyOnWriteArrayList<>();
