@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
     private void startTraining(View view) {
         binding.skeleton.setVisibility(View.INVISIBLE);
         binding.trainingWrapper.setVisibility(View.VISIBLE);
-        binding.trainingWrapper.startTraining();
+        binding.trainingWrapper.startTrainingCountdown();
         openCamera(view);
 
     }

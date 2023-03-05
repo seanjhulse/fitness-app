@@ -90,19 +90,44 @@
                         android:layout_height="wrap_content"
                         android:text="Start training in..."
                         android:textAlignment="center"
-                        android:textColor="@color/white"
+                        android:textColor="@color/design_default_color_primary_dark"
                         android:textSize="36sp"
                         tools:ignore="HardcodedText" />
 
+                    <LinearLayout
+                        android:layout_height="70dp"
+                        android:layout_marginVertical="10dp"
+                        android:layout_width="match_parent"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        tools:ignore="UseCompoundDrawables">
+                        <ImageView
+                            android:layout_height="45dp"
+                            android:layout_width="45dp"
+                            android:src="@drawable/pace"
+                            android:contentDescription="Timer"
+                            tools:ignore="HardcodedText"
+                            app:tint="@color/design_default_color_primary_dark" />
+                        <TextView
+                            android:id="@+id/trainingCountdownText"
+                            android:layout_width="50dp"
+                            android:layout_height="match_parent"
+                            android:text="5"
+                            android:gravity="center"
+                            android:textColor="@color/design_default_color_primary_dark"
+                            android:textSize="32sp"
+                            tools:ignore="HardcodedText" />
+                    </LinearLayout>
+
                     <TextView
-                        android:id="@+id/trainingCountdownText"
+                        android:id="@+id/trainingRepsCountdownText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="5"
+                        android:padding="10dp"
                         android:textAlignment="center"
-                        android:textColor="@color/white"
-                        android:textSize="36sp"
-                        tools:ignore="HardcodedText" />
+                        android:textColor="@color/design_default_color_primary_dark"
+                        android:textSize="24sp"
+                        android:visibility="invisible" />
 
                     <View
                         android:id="@+id/training"
