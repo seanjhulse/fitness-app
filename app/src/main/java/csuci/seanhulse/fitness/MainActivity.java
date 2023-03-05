@@ -38,16 +38,30 @@ public class MainActivity extends AppCompatActivity {
         this.homePage = viewFlipper.findViewById(R.id.homepage);
 
         MaterialButton defaultSquatButton = viewFlipper.findViewById(R.id.defaultSquatButton);
-        defaultSquatButton.setOnClickListener(this::openCamera);
+        defaultSquatButton.setOnClickListener(this::startExercising);
 
         ImageButton openHomepageButton = viewFlipper.findViewById(R.id.openHomepageButton);
         openHomepageButton.setOnClickListener(this::openHomepage);
 
-        FloatingActionButton trainWorkoutButton = viewFlipper.findViewById(R.id.trainWorkoutButton);
-        trainWorkoutButton.setOnClickListener(this::openCamera);
+        FloatingActionButton startTrainingButton = viewFlipper.findViewById(R.id.startTrainingButton);
+        startTrainingButton.setOnClickListener(this::startTraining);
 
         // Add the Skeleton class as a listener for the Pose Data Manager
         poseDataManager.addPoseDataListener(binding.skeleton);
+    }
+
+    private void startTraining(View view) {
+        binding.skeleton.setVisibility(View.INVISIBLE);
+        binding.trainingWrapper.setVisibility(View.VISIBLE);
+        binding.trainingWrapper.startTraining();
+        openCamera(view);
+
+    }
+
+    private void startExercising(View view) {
+        binding.skeleton.setVisibility(View.VISIBLE);
+        binding.trainingWrapper.setVisibility(View.INVISIBLE);
+        openCamera(view);
     }
 
     @Override

@@ -13,54 +13,54 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-                        <LinearLayout
-                            android:id="@+id/homepage"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical"
-                            android:visibility="visible">
+            <LinearLayout
+                android:id="@+id/homepage"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:visibility="visible">
 
-                            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                                android:id="@+id/trainWorkoutButton"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:clickable="true"
-                                android:layout_margin="20dp"
-                                android:contentDescription="Train a new workout"
-                                app:backgroundTint="@color/purple_200"
-                                app:rippleColor="@color/white"
-                                app:srcCompat="@drawable/model_training"
-                                tools:ignore="HardcodedText" />
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/startTrainingButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="20dp"
+                    android:clickable="true"
+                    android:contentDescription="Train a new workout"
+                    app:backgroundTint="@color/purple_200"
+                    app:rippleColor="@color/white"
+                    app:srcCompat="@drawable/model_training"
+                    tools:ignore="HardcodedText" />
 
-                            <TextView
-                                android:id="@+id/fitnessOptionsDescription"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:text="Your workouts"
-                                android:textAlignment="center"
-                                android:textSize="18sp"
-                                tools:ignore="HardcodedText" />
+                <TextView
+                    android:id="@+id/fitnessOptionsDescription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Your workouts"
+                    android:textAlignment="center"
+                    android:textSize="18sp"
+                    tools:ignore="HardcodedText" />
 
-                            <Button
-                                android:id="@+id/defaultSquatButton"
-                                android:layout_width="200dp"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:text="Squats"
-                                android:textAlignment="center"
-                                app:icon="@drawable/fitness_center"
-                                tools:ignore="HardcodedText" />
+                <Button
+                    android:id="@+id/defaultSquatButton"
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="Squats"
+                    android:textAlignment="center"
+                    app:icon="@drawable/fitness_center"
+                    tools:ignore="HardcodedText" />
 
-                            <Button
-                                android:id="@+id/defaultPushupButton"
-                                android:layout_width="200dp"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:text="Push ups"
-                                app:icon="@drawable/fitness_center"
-                                tools:ignore="HardcodedText" />
+                <Button
+                    android:id="@+id/defaultPushupButton"
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="Push ups"
+                    app:icon="@drawable/fitness_center"
+                    tools:ignore="HardcodedText" />
 
-                        </LinearLayout>
+            </LinearLayout>
 
             <RelativeLayout
                 android:id="@+id/cameraLayout"
@@ -77,10 +77,40 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
 
-                <csuci.seanhulse.fitness.training.Training
-                    android:id="@+id/training"
+                <csuci.seanhulse.fitness.training.TrainingWrapper
+                    android:id="@+id/trainingWrapper"
+                    android:paddingTop="100sp"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/trainingIndicator"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Start training in..."
+                        android:textAlignment="center"
+                        android:textColor="@color/white"
+                        android:textSize="36sp"
+                        tools:ignore="HardcodedText" />
+
+                    <TextView
+                        android:id="@+id/trainingCountdownText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="5"
+                        android:textAlignment="center"
+                        android:textColor="@color/white"
+                        android:textSize="36sp"
+                        tools:ignore="HardcodedText" />
+
+                    <View
+                        android:id="@+id/training"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+
+                </csuci.seanhulse.fitness.training.TrainingWrapper>
+
 
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:id="@+id/openHomepageButton"
