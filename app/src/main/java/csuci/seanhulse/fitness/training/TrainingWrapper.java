@@ -1,14 +1,14 @@
 package csuci.seanhulse.fitness.training;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.os.CountDownTimer;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import java.sql.Time;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import csuci.seanhulse.fitness.R;
 
@@ -19,15 +19,15 @@ import csuci.seanhulse.fitness.R;
  */
 public class TrainingWrapper extends LinearLayout {
 
-    private static final int INITIAL_TRAINING_COUNTDOWN_SEC = 3;
-    private static final int INITIAL_TRAINING_REPETITIONS = 6;
-    private final Timer countdownTimer = new Timer();
-    private final Timer repTimer = new Timer();
+    private static final int INITIAL_TRAINING_COUNTDOWN_SEC = 5;
+    private static final int DEFAULT_TIME_BETWEEN_REPS = 3;
+    private final CountDownTimer trainingTimer = createTrainingTimer(10);
+    private CountDownTimer clockTimer = createClockTimer(INITIAL_TRAINING_COUNTDOWN_SEC, true);
     private TextView startCountDownText;
     private TextView trainingIndicatorText;
     private TextView repCountDownText;
-    private int countDownValue;
-    private int repsValue = -1;
+
+    private int numberOfReps = 10;
 
     enum RepState {UP, DOWN}
 
@@ -41,99 +41,82 @@ public class TrainingWrapper extends LinearLayout {
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
+
         this.trainingIndicatorText = findViewById(R.id.trainingIndicator);
         this.startCountDownText = findViewById(R.id.trainingCountdownText);
         this.repCountDownText = findViewById(R.id.trainingRepsCountdownText);
     }
 
     public void startTrainingCountdown() {
-        runCountdownTimer(INITIAL_TRAINING_COUNTDOWN_SEC);
-
-        // Create a timer to being the training session
-        Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                runTrainingTimer(INITIAL_TRAINING_REPETITIONS);
-            }
-        }, INITIAL_TRAINING_COUNTDOWN_SEC * 1_000);
+        clockTimer.start();
     }
 
     public void stopTraining() {
-        countdownTimer.cancel();
-        repTimer.cancel();
+        clockTimer.cancel();
+        trainingTimer.cancel();
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
-        if (countDownValue >= 0) {
-            // Update the countdown value to the number of seconds left
-            CharSequence remainingSeconds = String.valueOf(countDownValue);
-            startCountDownText.setText(remainingSeconds);
-        }
-
-        if (repsValue >= 0) {
-            repCountDownText.setVisibility(VISIBLE);
-
-            // Update the countdown value to the number of repetitions of an exercise left
-            CharSequence remainingReps = String.valueOf(repsValue);
-            repCountDownText.setText(String.format("%s reps remaining", remainingReps));
-        }
-
-        if (repState == RepState.UP && repsValue > 0) {
-            trainingIndicatorText.setText("Up");
-        }
-
-        if (repState == RepState.DOWN && repsValue > 0) {
-            trainingIndicatorText.setText("Down");
-        }
 
     }
 
-    private void runTrainingTimer(int numberOfRepetitions) {
-        repsValue = numberOfRepetitions;
+    private CountDownTimer createTrainingTimer(int requestedNumberOfReps) {
+        this.numberOfReps = requestedNumberOfReps;
+        return new CountDownTimer(numberOfReps * DEFAULT_TIME_BETWEEN_REPS * 1_000L * 2L, DEFAULT_TIME_BETWEEN_REPS * 1_000L) {
 
-        countDownValue = INITIAL_TRAINING_COUNTDOWN_SEC;
-        runCountdownTimer(countDownValue);
-
-        repTimer.schedule(new TimerTask() {
             @Override
-            public void run() {
-                if (numberOfRepetitions > 0) {
-                    if (repState == RepState.UP) {
-                        // Toggle the rep state
-                        repState = RepState.DOWN;
+            public void onTick(long millisUntilFinished) {
+                clockTimer = createClockTimer(DEFAULT_TIME_BETWEEN_REPS, false);
+                clockTimer.start();
 
-                        // We've finished a repetition and need to move down to perform another
-                        runTrainingTimer(numberOfRepetitions - 1);
-                    } else {
-                        // Toggle the rep state
-                        repState = RepState.UP;
+                trainingIndicatorText.setText(String.format("Hold the %s position of your exercise", repState));
 
-                        // We're halfway through a repetition and need to move up to finish it
-                        runTrainingTimer(numberOfRepetitions);
-                    }
+                // Update the countdown value to the number of repetitions of an exercise left
+                CharSequence remainingReps = String.valueOf(numberOfReps);
+                repCountDownText.setText(String.format("%s reps remaining", remainingReps));
 
-                    // Force redraw of the view
-                    invalidate();
+                repState = repState == RepState.UP ? RepState.DOWN : RepState.UP;
+
+                if (repState == RepState.DOWN) {
+                    numberOfReps = numberOfReps - 1;
                 }
+
+                createScreenshotAnimation();
             }
-        }, 3_000);
+
+            @Override
+            public void onFinish() {
+                trainingIndicatorText.setText("Finished Exercise");
+                startCountDownText.setText("");
+            }
+        };
     }
 
-    private void runCountdownTimer(int numberOfSeconds) {
-        countDownValue = numberOfSeconds;
+    private CountDownTimer createClockTimer(int countdownSec, boolean startTrainingOnFinish) {
+        return new CountDownTimer(countdownSec * 1_000L, 1_000L) {
 
-        countdownTimer.schedule(new TimerTask() {
             @Override
-            public void run() {
-                if (numberOfSeconds > 0) {
-                    runCountdownTimer(numberOfSeconds - 1);
-                }
-
-                // Force redraw of the view
-                invalidate();
+            public void onTick(long millisUntilFinished) {
+                CharSequence remainingSeconds = String.valueOf((millisUntilFinished + 1_000L) / 1_000L);
+                startCountDownText.setText(remainingSeconds);
             }
-        }, 1_000);
+
+            @Override
+            public void onFinish() {
+                if (startTrainingOnFinish) {
+                    trainingTimer.start();
+                }
+            }
+        };
+    }
+
+    private void createScreenshotAnimation() {
+        ObjectAnimator colorFade = ObjectAnimator.ofObject(this, "backgroundColor",
+                new ArgbEvaluator(),
+                Color.argb(100,255,255,255),
+                Color.argb(0,0,0,0));
+        colorFade.setDuration(2_000);
+        colorFade.start();
     }
 }

@@ -18,7 +18,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:visibility="visible">
+                android:visibility="visible"
+                android:background="@color/cardview_dark_background">
 
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:id="@+id/startTrainingButton"
@@ -27,8 +28,8 @@
                     android:layout_margin="20dp"
                     android:clickable="true"
                     android:contentDescription="Train a new workout"
-                    app:backgroundTint="@color/purple_200"
-                    app:rippleColor="@color/white"
+                    app:backgroundTint="@color/white"
+                    app:rippleColor="@color/cardview_dark_background"
                     app:srcCompat="@drawable/model_training"
                     tools:ignore="HardcodedText" />
 
@@ -36,8 +37,9 @@
                     android:id="@+id/fitnessOptionsDescription"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Your workouts"
+                    android:text="Workouts"
                     android:textAlignment="center"
+                    android:textColor="@color/white"
                     android:textSize="18sp"
                     tools:ignore="HardcodedText" />
 
@@ -48,7 +50,10 @@
                     android:layout_gravity="center"
                     android:text="Squats"
                     android:textAlignment="center"
+                    android:backgroundTint="@color/white"
+                    android:textColor="@color/cardview_dark_background"
                     app:icon="@drawable/fitness_center"
+                    app:iconTint="@color/cardview_dark_background"
                     tools:ignore="HardcodedText" />
 
                 <Button
@@ -57,7 +62,10 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:text="Push ups"
+                    android:textColor="@color/cardview_dark_background"
+                    android:backgroundTint="@color/white"
                     app:icon="@drawable/fitness_center"
+                    app:iconTint="@color/cardview_dark_background"
                     tools:ignore="HardcodedText" />
 
             </LinearLayout>
@@ -79,7 +87,7 @@
 
                 <csuci.seanhulse.fitness.training.TrainingWrapper
                     android:id="@+id/trainingWrapper"
-                    android:paddingTop="100sp"
+                    android:paddingTop="100dp"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical">
@@ -90,16 +98,18 @@
                         android:layout_height="wrap_content"
                         android:text="Start training in..."
                         android:textAlignment="center"
-                        android:textColor="@color/design_default_color_primary_dark"
-                        android:textSize="36sp"
+                        android:background="#805E5E5E"
+                        android:textColor="@color/white"
+                        android:textSize="24sp"
                         tools:ignore="HardcodedText" />
 
                     <LinearLayout
-                        android:layout_height="70dp"
-                        android:layout_marginVertical="10dp"
+                        android:layout_height="50dp"
                         android:layout_width="match_parent"
+                        android:background="#805E5E5E"
                         android:orientation="horizontal"
                         android:gravity="center"
+                        android:layout_margin="0dp"
                         tools:ignore="UseCompoundDrawables">
                         <ImageView
                             android:layout_height="45dp"
@@ -107,14 +117,14 @@
                             android:src="@drawable/pace"
                             android:contentDescription="Timer"
                             tools:ignore="HardcodedText"
-                            app:tint="@color/design_default_color_primary_dark" />
+                            app:tint="@color/white" />
                         <TextView
                             android:id="@+id/trainingCountdownText"
-                            android:layout_width="50dp"
+                            android:layout_width="25dp"
                             android:layout_height="match_parent"
                             android:text="5"
                             android:gravity="center"
-                            android:textColor="@color/design_default_color_primary_dark"
+                            android:textColor="@color/white"
                             android:textSize="32sp"
                             tools:ignore="HardcodedText" />
                     </LinearLayout>
@@ -123,11 +133,10 @@
                         android:id="@+id/trainingRepsCountdownText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="10dp"
                         android:textAlignment="center"
-                        android:textColor="@color/design_default_color_primary_dark"
+                        android:textColor="@color/white"
                         android:textSize="24sp"
-                        android:visibility="invisible" />
+                        android:background="#805E5E5E" />
 
                     <View
                         android:id="@+id/training"
