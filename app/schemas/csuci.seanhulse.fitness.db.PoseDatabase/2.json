@@ -1,18 +1,24 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 0,
-    "identityHash": "0373da7237f07163c52c53d2e64e13f1",
+    "version": 2,
+    "identityHash": "1bfb0977a6aa4648c5c90ded0bad8dad",
     "entities": [
       {
         "tableName": "Pose",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `landmarks` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `datetime` TEXT, `landmarks` TEXT)",
         "fields": [
           {
             "fieldPath": "id",
             "columnName": "id",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "datetime",
+            "columnName": "datetime",
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "landmarks",
@@ -34,7 +40,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0373da7237f07163c52c53d2e64e13f1')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1bfb0977a6aa4648c5c90ded0bad8dad')"
     ]
   }
 }

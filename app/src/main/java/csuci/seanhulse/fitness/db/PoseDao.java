@@ -12,11 +12,11 @@ public interface PoseDao {
     @Query("SELECT * FROM pose")
     List<Pose> loadAll();
 
-    @Query("SELECT * FROM pose WHERE landmark_type IN (:landmarkTypes)")
-    List<Pose> loadAllPosesByType(int... landmarkTypes);
-
     @Insert
     void insertAll(Pose... poses);
+
+    @Insert
+    void insert(Pose pose);
 
     @Delete
     void delete(Pose pose);

@@ -2,23 +2,32 @@ package csuci.seanhulse.fitness.db;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
-/**
- * Represents an instance of a Pose.
- */
+import java.util.List;
+
 @Entity
 public class Pose {
-    @PrimaryKey
+
+    @PrimaryKey(autoGenerate = true)
     private int id;
 
-    @ColumnInfo(name = "landmark_type")
-    private int landmarkType;
+    @ColumnInfo(name = "datetime")
+    private String datetime;
 
-    // Pose Landmark (x, y, z) position
-    private int x;
-    private int y;
-    private int z;
+    @ColumnInfo(name = "landmarks")
+    private List<Landmark> landmarks;
+
+    @Ignore
+    public Pose() {
+
+    }
+
+    public Pose(List<Landmark> landmarks, String datetime) {
+        this.landmarks = landmarks;
+        this.datetime = datetime;
+    }
 
     public int getId() {
         return id;
@@ -28,35 +37,19 @@ public class Pose {
         this.id = id;
     }
 
-    public int getLandmarkType() {
-        return landmarkType;
+    public List<Landmark> getLandmarks() {
+        return landmarks;
     }
 
-    public void setLandmarkType(int landmarkType) {
-        this.landmarkType = landmarkType;
+    public String getDatetime() {
+        return datetime;
     }
 
-    public int getX() {
-        return x;
+    public void setDatetime(String datetime) {
+        this.datetime = datetime;
     }
 
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public void setY(int y) {
-        this.y = y;
-    }
-
-    public int getZ() {
-        return z;
-    }
-
-    public void setZ(int z) {
-        this.z = z;
+    public void setLandmarks(List<Landmark> landmarks) {
+        this.landmarks = landmarks;
     }
 }

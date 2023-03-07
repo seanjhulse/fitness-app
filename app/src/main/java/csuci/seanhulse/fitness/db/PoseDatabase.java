@@ -2,10 +2,10 @@ package csuci.seanhulse.fitness.db;
 
 import androidx.room.Database;
 import androidx.room.RoomDatabase;
+import androidx.room.TypeConverters;
 
-import csuci.seanhulse.fitness.data.IPoseDataListener;
-
-@Database(entities = {Pose.class}, version = 0)
+@Database(entities = {Pose.class}, version = 2)
+@TypeConverters({Converters.class})
 public abstract class PoseDatabase extends RoomDatabase {
     public abstract PoseDao poseDao();
 }

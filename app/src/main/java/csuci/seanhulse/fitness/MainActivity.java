@@ -9,6 +9,13 @@ import android.widget.ViewFlipper;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.amplifyframework.AmplifyException;
+import com.amplifyframework.auth.cognito.AWSCognitoAuthPlugin;
+import com.amplifyframework.core.Amplify;
+import com.amplifyframework.logging.AndroidLoggingPlugin;
+import com.amplifyframework.logging.LogLevel;
+import com.amplifyframework.storage.s3.AWSS3StoragePlugin;
+import com.amplifyframework.storage.s3.configuration.AWSS3StoragePluginConfiguration;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -48,6 +55,19 @@ public class MainActivity extends AppCompatActivity {
 
         // Add the Skeleton class as a listener for the Pose Data Manager
         poseDataManager.addPoseDataListener(binding.skeleton);
+        poseDataManager.addPoseDataListener(binding.trainingWrapper);
+
+        // Initialize Amplify for AWS S3 connection
+        try {
+
+            Amplify.addPlugin(new AndroidLoggingPlugin(LogLevel.VERBOSE));
+            Amplify.addPlugin(new AWSCognitoAuthPlugin());
+            Amplify.addPlugin(new AWSS3StoragePlugin());
+            Amplify.configure(getApplicationContext());
+        } catch (AmplifyException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     private void startTraining(View view) {

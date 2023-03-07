@@ -103,7 +103,7 @@ public class CameraManager {
 
     private UseCase createImageAnalysisUseCase() {
         ImageAnalysis analyzer = new ImageAnalysis.Builder().build();
-        analyzer.setAnalyzer(cameraExecutor, new Analyzer(context, poseDataManager, true));
+        analyzer.setAnalyzer(cameraExecutor, new Analyzer(poseDataManager, true));
         return analyzer;
     }
 

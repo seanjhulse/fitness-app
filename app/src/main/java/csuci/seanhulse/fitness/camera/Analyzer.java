@@ -27,9 +27,8 @@ public class Analyzer implements ImageAnalysis.Analyzer {
     private final PoseDetector poseDetector;
     private final boolean isImageFlipped;
     private final PoseDataManager poseDataManager;
-    private final PoseDatabase db;
 
-    public Analyzer(Context context, PoseDataManager poseDataManager, boolean isImageFlipped) {
+    public Analyzer(PoseDataManager poseDataManager, boolean isImageFlipped) {
         this.poseDataManager = poseDataManager;
         this.isImageFlipped = isImageFlipped;
 
@@ -38,10 +37,6 @@ public class Analyzer implements ImageAnalysis.Analyzer {
                 .build();
 
         poseDetector = PoseDetection.getClient(poseDetectorOptions);
-
-        this.db = Room
-                .databaseBuilder(context, PoseDatabase.class, "pose-database")
-                .build();
     }
 
     @Override
