@@ -16,6 +16,9 @@ public class Pose {
     @ColumnInfo(name = "datetime")
     private String datetime;
 
+    @ColumnInfo(name = "state")
+    private String state;
+
     @ColumnInfo(name = "landmarks")
     private List<Landmark> landmarks;
 
@@ -24,9 +27,10 @@ public class Pose {
 
     }
 
-    public Pose(List<Landmark> landmarks, String datetime) {
+    public Pose(List<Landmark> landmarks, String datetime, String state) {
         this.landmarks = landmarks;
         this.datetime = datetime;
+        this.state = state;
     }
 
     public int getId() {
@@ -51,5 +55,13 @@ public class Pose {
 
     public void setLandmarks(List<Landmark> landmarks) {
         this.landmarks = landmarks;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 }

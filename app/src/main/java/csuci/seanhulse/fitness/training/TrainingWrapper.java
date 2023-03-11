@@ -14,19 +14,18 @@ import android.widget.TextView;
 import androidx.room.Room;
 
 import com.amplifyframework.core.Amplify;
+import com.google.gson.Gson;
 import com.google.mlkit.vision.common.PointF3D;
 import com.google.mlkit.vision.pose.Pose;
 import com.google.mlkit.vision.pose.PoseLandmark;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
-import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import csuci.seanhulse.fitness.R;
@@ -45,6 +44,7 @@ public class TrainingWrapper extends LinearLayout implements IPoseDataListener {
     private static final int DEFAULT_TIME_BETWEEN_REPS = 3;
     private static final float IN_FRAME_LIKELIHOOD_VALUE = 0.75f;
     private static final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mmZ");
+    private static final Gson gson = new Gson();
 
     private final CountDownTimer trainingTimer = createTrainingTimer(10);
     private final PoseDatabase db;
@@ -107,7 +107,8 @@ public class TrainingWrapper extends LinearLayout implements IPoseDataListener {
 
     private CountDownTimer createTrainingTimer(int requestedNumberOfReps) {
         this.numberOfReps = requestedNumberOfReps;
-        return new CountDownTimer(numberOfReps * DEFAULT_TIME_BETWEEN_REPS * 1_000L * 2L, DEFAULT_TIME_BETWEEN_REPS * 1_000L) {
+        return new CountDownTimer(numberOfReps * DEFAULT_TIME_BETWEEN_REPS * 1_000L * 2L,
+                DEFAULT_TIME_BETWEEN_REPS * 1_000L) {
 
             @Override
             public void onTick(long millisUntilFinished) {
@@ -135,29 +136,15 @@ public class TrainingWrapper extends LinearLayout implements IPoseDataListener {
                         List<Landmark> landmarks = createDbLandmarkFromPose(pose.getAllPoseLandmarks());
                         if (!landmarks.isEmpty()) {
                             String nowAsString = df.format(new Date());
-                            csuci.seanhulse.fitness.db.Pose pose = new csuci.seanhulse.fitness.db.Pose(landmarks, nowAsString);
+                            csuci.seanhulse.fitness.db.Pose pose = new csuci.seanhulse.fitness.db.Pose(landmarks,
+                                    nowAsString, repState.toString());
 
                             // Insert pose into the database
                             AsyncTask.execute(() -> {
                                 db.poseDao().insert(pose);
                                 db.poseDao().loadAll();
 
-                                File exampleFile = new File(getContext().getFilesDir(), "ExampleKey");
-
-                                try {
-                                    BufferedWriter writer = new BufferedWriter(new FileWriter(exampleFile));
-                                    writer.append("Example file contents");
-                                    writer.close();
-                                } catch (Exception exception) {
-                                    Log.e("MyAmplifyApp", "Upload failed", exception);
-                                }
-
-                                Amplify.Storage.uploadFile(
-                                        "ExampleKey",
-                                        exampleFile,
-                                        result -> Log.i("MyAmplifyApp", "Successfully uploaded: " + result.getKey()),
-                                        storageFailure -> Log.e("MyAmplifyApp", "Upload failed", storageFailure)
-                                );
+                                uploadPoseToS3(pose);
                             });
                         }
                     } catch (Exception e) {
@@ -174,6 +161,24 @@ public class TrainingWrapper extends LinearLayout implements IPoseDataListener {
 
             }
         };
+    }
+
+    private void uploadPoseToS3(csuci.seanhulse.fitness.db.Pose pose) {
+        byte[] jsonBytes = gson.toJson(pose).getBytes(StandardCharsets.UTF_8);
+        InputStream inputStream = new ByteArrayInputStream(jsonBytes);
+
+        try {
+            Amplify.Storage.uploadInputStream(
+                    String.valueOf(pose.getId()),
+                    inputStream,
+                    result -> Log.i("Training Upload", "Successfully uploaded: " + result.getKey()),
+                    storageFailure -> Log.e("Training Upload", "Upload failed", storageFailure)
+            );
+            inputStream.close();
+        } catch (Exception exception) {
+            Log.e("Training Upload", "Upload failed", exception);
+        }
+
     }
 
     private List<Landmark> createDbLandmarkFromPose(List<PoseLandmark> poseLandmarks) {
