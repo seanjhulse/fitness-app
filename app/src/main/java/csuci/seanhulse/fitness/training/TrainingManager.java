@@ -19,13 +19,14 @@ import com.google.mlkit.vision.common.PointF3D;
 import com.google.mlkit.vision.pose.Pose;
 import com.google.mlkit.vision.pose.PoseLandmark;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import csuci.seanhulse.fitness.R;
@@ -38,17 +39,18 @@ import csuci.seanhulse.fitness.db.PoseDatabase;
  *
  * @since 1.0.0
  */
-public class TrainingWrapper extends LinearLayout implements IPoseDataListener {
+public class TrainingManager extends LinearLayout implements IPoseDataListener {
 
     private static final int INITIAL_TRAINING_COUNTDOWN_SEC = 5;
     private static final int DEFAULT_TIME_BETWEEN_REPS = 3;
-    private static final float IN_FRAME_LIKELIHOOD_VALUE = 0.75f;
+    private static final float IN_FRAME_LIKELIHOOD_VALUE = 0.90f;
     private static final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mmZ");
+    private static final CharSequence finishedExercise = "Finished Exercise";
     private static final Gson gson = new Gson();
-
-    private final CountDownTimer trainingTimer = createTrainingTimer(10);
     private final PoseDatabase db;
-    private CountDownTimer clockTimer = createClockTimer(INITIAL_TRAINING_COUNTDOWN_SEC, true);
+    private final Context context;
+    private CountDownTimer trainingTimer;
+    private CountDownTimer clockTimer;
     private TextView startCountDownText;
     private TextView trainingIndicatorText;
     private TextView repCountDownText;
@@ -60,9 +62,11 @@ public class TrainingWrapper extends LinearLayout implements IPoseDataListener {
 
     private RepState repState = RepState.UP;
 
-    public TrainingWrapper(Context context, AttributeSet attrs) {
+    public TrainingManager(Context context, AttributeSet attrs) {
         super(context, attrs);
         setWillNotDraw(false);
+
+        this.context = context;
 
         // Setup the database
         this.db = Room
@@ -87,12 +91,17 @@ public class TrainingWrapper extends LinearLayout implements IPoseDataListener {
     }
 
     public void startTrainingCountdown() {
+        clockTimer = createClockTimer(INITIAL_TRAINING_COUNTDOWN_SEC, true);
         clockTimer.start();
     }
 
     public void stopTraining() {
-        clockTimer.cancel();
-        trainingTimer.cancel();
+        if (clockTimer != null) {
+            clockTimer.cancel();
+        }
+        if (trainingTimer != null) {
+            trainingTimer.cancel();
+        }
     }
 
     @Override
@@ -107,8 +116,10 @@ public class TrainingWrapper extends LinearLayout implements IPoseDataListener {
 
     private CountDownTimer createTrainingTimer(int requestedNumberOfReps) {
         this.numberOfReps = requestedNumberOfReps;
-        return new CountDownTimer(numberOfReps * DEFAULT_TIME_BETWEEN_REPS * 1_000L * 2L,
-                DEFAULT_TIME_BETWEEN_REPS * 1_000L) {
+        final long millisecondsInFuture = numberOfReps * DEFAULT_TIME_BETWEEN_REPS * 1_000L * 2L;
+        final long countDownInterval = DEFAULT_TIME_BETWEEN_REPS * 1_000L;
+
+        return new CountDownTimer(millisecondsInFuture, countDownInterval) {
 
             @Override
             public void onTick(long millisUntilFinished) {
@@ -138,6 +149,7 @@ public class TrainingWrapper extends LinearLayout implements IPoseDataListener {
                             String nowAsString = df.format(new Date());
                             csuci.seanhulse.fitness.db.Pose pose = new csuci.seanhulse.fitness.db.Pose(landmarks,
                                     nowAsString, repState.toString());
+                            pose.setId(UUID.randomUUID());
 
                             // Insert pose into the database
                             AsyncTask.execute(() -> {
@@ -155,28 +167,27 @@ public class TrainingWrapper extends LinearLayout implements IPoseDataListener {
 
             @Override
             public void onFinish() {
-                trainingIndicatorText.setText("Finished Exercise");
+                trainingIndicatorText.setText(finishedExercise);
                 startCountDownText.setText("");
                 repCountDownText.setText("");
-
             }
         };
     }
 
     private void uploadPoseToS3(csuci.seanhulse.fitness.db.Pose pose) {
-        byte[] jsonBytes = gson.toJson(pose).getBytes(StandardCharsets.UTF_8);
-        InputStream inputStream = new ByteArrayInputStream(jsonBytes);
+        final File file = new File(context.getFilesDir(), pose.getId().toString());
 
         try {
-            Amplify.Storage.uploadInputStream(
-                    String.valueOf(pose.getId()),
-                    inputStream,
-                    result -> Log.i("Training Upload", "Successfully uploaded: " + result.getKey()),
-                    storageFailure -> Log.e("Training Upload", "Upload failed", storageFailure)
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            writer.append(gson.toJson(pose));
+            writer.close();
+            Amplify.Storage.uploadFile(pose.getId().toString(),
+                    file,
+                    result -> Log.i("Training upload", "Successfully uploaded: " + result.getKey()),
+                    storageFailure -> Log.e("Training upload", "Upload failed", storageFailure)
             );
-            inputStream.close();
         } catch (Exception exception) {
-            Log.e("Training Upload", "Upload failed", exception);
+            Log.e("Training upload", "Upload failed", exception);
         }
 
     }
@@ -190,7 +201,8 @@ public class TrainingWrapper extends LinearLayout implements IPoseDataListener {
                     return new Landmark(position.getX(),
                             position.getY(),
                             position.getZ(),
-                            landmark.getLandmarkType());
+                            landmark.getLandmarkType(),
+                            landmark.getInFrameLikelihood());
                 })
                 .collect(Collectors.toList());
     }
@@ -207,6 +219,7 @@ public class TrainingWrapper extends LinearLayout implements IPoseDataListener {
             @Override
             public void onFinish() {
                 if (startTrainingOnFinish) {
+                    trainingTimer = createTrainingTimer(10);
                     trainingTimer.start();
                 }
             }

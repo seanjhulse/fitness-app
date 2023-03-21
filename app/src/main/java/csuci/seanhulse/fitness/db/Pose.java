@@ -1,17 +1,20 @@
 package csuci.seanhulse.fitness.db;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 public class Pose {
 
-    @PrimaryKey(autoGenerate = true)
-    private int id;
+    @PrimaryKey
+    @NonNull
+    private UUID id;
 
     @ColumnInfo(name = "datetime")
     private String datetime;
@@ -33,11 +36,12 @@ public class Pose {
         this.state = state;
     }
 
-    public int getId() {
+    @NonNull
+    public UUID getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(@NonNull UUID id) {
         this.id = id;
     }
 

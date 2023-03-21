@@ -1,11 +1,8 @@
 package csuci.seanhulse.fitness.db;
 
-import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
-
-import com.google.mlkit.vision.pose.PoseLandmark;
 
 /**
  * Represents an instance of a Pose.
@@ -24,16 +21,19 @@ public class Landmark {
 
     private int landmarkType;
 
+    private float confidence;
+
     @Ignore
     public Landmark() {
 
     }
 
-    public Landmark(float x, float y, float z, int landmarkType) {
+    public Landmark(float x, float y, float z, int landmarkType, float confidence) {
         this.x = x;
         this.y = y;
         this.z = z;
         this.landmarkType = landmarkType;
+        this.confidence = confidence;
     }
 
 
@@ -55,5 +55,9 @@ public class Landmark {
 
     public int getId() {
         return id;
+    }
+
+    public float getConfidence() {
+        return confidence;
     }
 }

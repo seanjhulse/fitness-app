@@ -15,18 +15,19 @@ import com.amplifyframework.core.Amplify;
 import com.amplifyframework.logging.AndroidLoggingPlugin;
 import com.amplifyframework.logging.LogLevel;
 import com.amplifyframework.storage.s3.AWSS3StoragePlugin;
-import com.amplifyframework.storage.s3.configuration.AWSS3StoragePluginConfiguration;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import csuci.seanhulse.fitness.camera.CameraManager;
 import csuci.seanhulse.fitness.data.PoseDataManager;
 import csuci.seanhulse.fitness.databinding.ActivityMainBinding;
+import csuci.seanhulse.fitness.training.TrainingManager;
 
 public class MainActivity extends AppCompatActivity {
     private ViewFlipper viewFlipper;
     private View cameraLayout;
     private View homePage;
+    private TrainingManager trainingManager;
     private CameraManager cameraManager;
     private Context applicationContext;
     private ActivityMainBinding binding;
@@ -43,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
         this.viewFlipper = findViewById(R.id.viewFlipper);
         this.cameraLayout = viewFlipper.findViewById(R.id.cameraLayout);
         this.homePage = viewFlipper.findViewById(R.id.homepage);
+        this.trainingManager = viewFlipper.findViewById(R.id.trainingManager);
 
         MaterialButton defaultSquatButton = viewFlipper.findViewById(R.id.defaultSquatButton);
         defaultSquatButton.setOnClickListener(this::startExercising);
@@ -55,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Add the Skeleton class as a listener for the Pose Data Manager
         poseDataManager.addPoseDataListener(binding.skeleton);
-        poseDataManager.addPoseDataListener(binding.trainingWrapper);
+        poseDataManager.addPoseDataListener(binding.trainingManager);
 
         // Initialize Amplify for AWS S3 connection
         try {
@@ -72,15 +74,15 @@ public class MainActivity extends AppCompatActivity {
 
     private void startTraining(View view) {
         binding.skeleton.setVisibility(View.INVISIBLE);
-        binding.trainingWrapper.setVisibility(View.VISIBLE);
-        binding.trainingWrapper.startTrainingCountdown();
+        binding.trainingManager.setVisibility(View.VISIBLE);
+        binding.trainingManager.startTrainingCountdown();
         openCamera(view);
 
     }
 
     private void startExercising(View view) {
         binding.skeleton.setVisibility(View.VISIBLE);
-        binding.trainingWrapper.setVisibility(View.INVISIBLE);
+        binding.trainingManager.setVisibility(View.INVISIBLE);
         openCamera(view);
     }
 
@@ -103,5 +105,6 @@ public class MainActivity extends AppCompatActivity {
     public void openHomepage(View listener) {
         viewFlipper.setDisplayedChild(viewFlipper.indexOfChild(homePage));
         cameraManager.stop();
+        trainingManager.stopTraining();
     }
 }

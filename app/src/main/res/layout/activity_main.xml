@@ -85,8 +85,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
 
-                <csuci.seanhulse.fitness.training.TrainingWrapper
-                    android:id="@+id/trainingWrapper"
+                <csuci.seanhulse.fitness.training.TrainingManager
+                    android:id="@+id/trainingManager"
                     android:paddingTop="100dp"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -143,7 +143,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent" />
 
-                </csuci.seanhulse.fitness.training.TrainingWrapper>
+                </csuci.seanhulse.fitness.training.TrainingManager>
 
 
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
