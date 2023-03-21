@@ -25,15 +25,19 @@ public class Pose {
     @ColumnInfo(name = "landmarks")
     private List<Landmark> landmarks;
 
+    @ColumnInfo(name = "exerciseName")
+    private String exerciseName;
+
     @Ignore
     public Pose() {
 
     }
 
-    public Pose(List<Landmark> landmarks, String datetime, String state) {
+    public Pose(List<Landmark> landmarks, String datetime, String state, String exerciseName) {
         this.landmarks = landmarks;
         this.datetime = datetime;
         this.state = state;
+        this.exerciseName = exerciseName;
     }
 
     @NonNull
@@ -51,6 +55,10 @@ public class Pose {
 
     public String getDatetime() {
         return datetime;
+    }
+
+    public String getExerciseName() {
+        return exerciseName;
     }
 
     public void setDatetime(String datetime) {

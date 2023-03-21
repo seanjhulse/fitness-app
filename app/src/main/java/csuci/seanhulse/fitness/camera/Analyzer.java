@@ -1,13 +1,11 @@
 package csuci.seanhulse.fitness.camera;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.media.Image;
 
 import androidx.annotation.NonNull;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageProxy;
-import androidx.room.Room;
 
 import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.pose.PoseDetection;
@@ -15,7 +13,6 @@ import com.google.mlkit.vision.pose.PoseDetector;
 import com.google.mlkit.vision.pose.accurate.AccuratePoseDetectorOptions;
 
 import csuci.seanhulse.fitness.data.PoseDataManager;
-import csuci.seanhulse.fitness.db.PoseDatabase;
 
 /**
  * Image Analysis Analyzer which uses Google's Pose Detection ML API for detecting a human pose.

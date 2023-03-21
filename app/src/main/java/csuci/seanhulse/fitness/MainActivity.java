@@ -8,6 +8,7 @@ import android.widget.ImageButton;
 import android.widget.ViewFlipper;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 
 import com.amplifyframework.AmplifyException;
 import com.amplifyframework.auth.cognito.AWSCognitoAuthPlugin;
@@ -61,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize Amplify for AWS S3 connection
         try {
-
             Amplify.addPlugin(new AndroidLoggingPlugin(LogLevel.VERBOSE));
             Amplify.addPlugin(new AWSCognitoAuthPlugin());
             Amplify.addPlugin(new AWSS3StoragePlugin());
@@ -73,9 +73,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startTraining(View view) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
         binding.skeleton.setVisibility(View.INVISIBLE);
         binding.trainingManager.setVisibility(View.VISIBLE);
-        binding.trainingManager.startTrainingCountdown();
+        binding.trainingManager.startTraining(fragmentManager);
         openCamera(view);
 
     }

@@ -2,15 +2,19 @@ package csuci.seanhulse.fitness.training;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.CountDownTimer;
+import android.text.Editable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.room.Room;
 
 import com.amplifyframework.core.Amplify;
@@ -44,6 +48,7 @@ public class TrainingManager extends LinearLayout implements IPoseDataListener {
     private static final int INITIAL_TRAINING_COUNTDOWN_SEC = 5;
     private static final int DEFAULT_TIME_BETWEEN_REPS = 3;
     private static final float IN_FRAME_LIKELIHOOD_VALUE = 0.90f;
+    @SuppressLint("SimpleDateFormat")
     private static final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mmZ");
     private static final CharSequence finishedExercise = "Finished Exercise";
     private static final Gson gson = new Gson();
@@ -53,6 +58,7 @@ public class TrainingManager extends LinearLayout implements IPoseDataListener {
     private CountDownTimer clockTimer;
     private TextView startCountDownText;
     private TextView trainingIndicatorText;
+    private String exerciseName = "DEFAULT";
     private TextView repCountDownText;
     // This should represent the most recent pose added by the PoseDataManager
     private Pose pose = null;
@@ -90,9 +96,15 @@ public class TrainingManager extends LinearLayout implements IPoseDataListener {
         this.repCountDownText = findViewById(R.id.trainingRepsCountdownText);
     }
 
-    public void startTrainingCountdown() {
+    public void startTrainingCountdown(String exerciseName) {
+        this.exerciseName = exerciseName;
         clockTimer = createClockTimer(INITIAL_TRAINING_COUNTDOWN_SEC, true);
         clockTimer.start();
+    }
+
+    public void startTraining(FragmentManager fragmentManager) {
+        DialogFragment trainingDialog = new TrainingDialog(this);
+        trainingDialog.show(fragmentManager, "Training Dialog");
     }
 
     public void stopTraining() {
@@ -148,7 +160,7 @@ public class TrainingManager extends LinearLayout implements IPoseDataListener {
                         if (!landmarks.isEmpty()) {
                             String nowAsString = df.format(new Date());
                             csuci.seanhulse.fitness.db.Pose pose = new csuci.seanhulse.fitness.db.Pose(landmarks,
-                                    nowAsString, repState.toString());
+                                    nowAsString, repState.toString(), exerciseName);
                             pose.setId(UUID.randomUUID());
 
                             // Insert pose into the database
@@ -181,7 +193,7 @@ public class TrainingManager extends LinearLayout implements IPoseDataListener {
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
             writer.append(gson.toJson(pose));
             writer.close();
-            Amplify.Storage.uploadFile(pose.getId().toString(),
+            Amplify.Storage.uploadFile(String.format("%s/%s", exerciseName, pose.getId()),
                     file,
                     result -> Log.i("Training upload", "Successfully uploaded: " + result.getKey()),
                     storageFailure -> Log.e("Training upload", "Upload failed", storageFailure)
