@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".training.NewExerciseFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="25dp"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/form_new_exercise_title"
+            android:textSize="28sp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="5dp"
+            android:text="@string/form_new_exercise_description" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="25dp"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textSize="22sp"
+            android:text="@string/form_exercise_name_label" />
+        <EditText
+            android:id="@+id/exerciseName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/exerciseNameHint"
+            android:layout_gravity="center"
+            android:importantForAutofill="no"
+            android:textSize="22sp"
+            android:inputType="text" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/form_exercise_reps_label"
+            android:textSize="22sp" />
+        <EditText
+            android:id="@+id/exerciseRepsPerSet"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textSize="22sp"
+            android:hint="@string/form_exercise_reps_default_value"
+            android:importantForAutofill="no"
+            android:inputType="number" />
+        <Button
+            android:id="@+id/createNewExerciseButton"
+            android:layout_width="match_parent"
+            android:text="@string/form_exercise_create_button_label"
+            android:layout_height="75dp"
+            android:layout_gravity="bottom" />
+    </LinearLayout>
+
+</LinearLayout>

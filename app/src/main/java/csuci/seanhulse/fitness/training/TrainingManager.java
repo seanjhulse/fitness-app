@@ -7,7 +7,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.CountDownTimer;
-import android.text.Editable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.LinearLayout;
@@ -35,6 +34,7 @@ import java.util.stream.Collectors;
 
 import csuci.seanhulse.fitness.R;
 import csuci.seanhulse.fitness.data.IPoseDataListener;
+import csuci.seanhulse.fitness.db.Exercise;
 import csuci.seanhulse.fitness.db.Landmark;
 import csuci.seanhulse.fitness.db.PoseDatabase;
 
@@ -56,10 +56,7 @@ public class TrainingManager extends LinearLayout implements IPoseDataListener {
     private final Context context;
     private CountDownTimer trainingTimer;
     private CountDownTimer clockTimer;
-    private TextView startCountDownText;
-    private TextView trainingIndicatorText;
-    private String exerciseName = "DEFAULT";
-    private TextView repCountDownText;
+    private Exercise exercise;
     // This should represent the most recent pose added by the PoseDataManager
     private Pose pose = null;
     private int numberOfReps = 10;
@@ -81,30 +78,25 @@ public class TrainingManager extends LinearLayout implements IPoseDataListener {
                 .build();
 
         // TODO: Remove! Deletes the entire database whenever we re-run the training wrapper
-        AsyncTask.execute(() -> {
-            List<csuci.seanhulse.fitness.db.Pose> poses = this.db.poseDao().loadAll();
-            poses.forEach(pose -> this.db.poseDao().delete(pose));
-        });
+//        AsyncTask.execute(() -> {
+//            List<csuci.seanhulse.fitness.db.Pose> poses = this.db.poseDao().loadAll();
+//            poses.forEach(pose -> this.db.poseDao().delete(pose));
+//        });
     }
 
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-
-        this.trainingIndicatorText = findViewById(R.id.trainingIndicator);
-        this.startCountDownText = findViewById(R.id.trainingCountdownText);
-        this.repCountDownText = findViewById(R.id.trainingRepsCountdownText);
     }
 
-    public void startTrainingCountdown(String exerciseName) {
-        this.exerciseName = exerciseName;
-        clockTimer = createClockTimer(INITIAL_TRAINING_COUNTDOWN_SEC, true);
+    public void startTrainingCountdown(Exercise exercise) {
+        clockTimer = createClockTimer(INITIAL_TRAINING_COUNTDOWN_SEC, true, exercise);
         clockTimer.start();
     }
 
     public void startTraining(FragmentManager fragmentManager) {
-        DialogFragment trainingDialog = new TrainingDialog(this);
-        trainingDialog.show(fragmentManager, "Training Dialog");
+//        DialogFragment trainingDialog = new TrainingDialog(this);
+//        trainingDialog.show(fragmentManager, "Training Dialog");
     }
 
     public void stopTraining() {
@@ -126,7 +118,7 @@ public class TrainingManager extends LinearLayout implements IPoseDataListener {
         // IGNORE since we don't care about these values
     }
 
-    private CountDownTimer createTrainingTimer(int requestedNumberOfReps) {
+    private CountDownTimer createTrainingTimer(int requestedNumberOfReps, Exercise exercise) {
         this.numberOfReps = requestedNumberOfReps;
         final long millisecondsInFuture = numberOfReps * DEFAULT_TIME_BETWEEN_REPS * 1_000L * 2L;
         final long countDownInterval = DEFAULT_TIME_BETWEEN_REPS * 1_000L;
@@ -135,14 +127,8 @@ public class TrainingManager extends LinearLayout implements IPoseDataListener {
 
             @Override
             public void onTick(long millisUntilFinished) {
-                clockTimer = createClockTimer(DEFAULT_TIME_BETWEEN_REPS, false);
+                clockTimer = createClockTimer(DEFAULT_TIME_BETWEEN_REPS, false, TrainingManager.this.exercise);
                 clockTimer.start();
-
-                trainingIndicatorText.setText(String.format("Hold the %s position of your exercise", repState));
-
-                // Update the countdown value to the number of repetitions of an exercise left
-                CharSequence remainingReps = String.valueOf(numberOfReps);
-                repCountDownText.setText(String.format("%s reps remaining", remainingReps));
 
                 repState = repState == RepState.UP ? RepState.DOWN : RepState.UP;
 
@@ -160,7 +146,7 @@ public class TrainingManager extends LinearLayout implements IPoseDataListener {
                         if (!landmarks.isEmpty()) {
                             String nowAsString = df.format(new Date());
                             csuci.seanhulse.fitness.db.Pose pose = new csuci.seanhulse.fitness.db.Pose(landmarks,
-                                    nowAsString, repState.toString(), exerciseName);
+                                    nowAsString, repState.toString(), exercise.getId());
                             pose.setId(UUID.randomUUID());
 
                             // Insert pose into the database
@@ -179,9 +165,6 @@ public class TrainingManager extends LinearLayout implements IPoseDataListener {
 
             @Override
             public void onFinish() {
-                trainingIndicatorText.setText(finishedExercise);
-                startCountDownText.setText("");
-                repCountDownText.setText("");
             }
         };
     }
@@ -193,7 +176,7 @@ public class TrainingManager extends LinearLayout implements IPoseDataListener {
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
             writer.append(gson.toJson(pose));
             writer.close();
-            Amplify.Storage.uploadFile(String.format("%s/%s", exerciseName, pose.getId()),
+            Amplify.Storage.uploadFile(String.format("%s/%s", exercise.getName(), pose.getId()),
                     file,
                     result -> Log.i("Training upload", "Successfully uploaded: " + result.getKey()),
                     storageFailure -> Log.e("Training upload", "Upload failed", storageFailure)
@@ -219,19 +202,17 @@ public class TrainingManager extends LinearLayout implements IPoseDataListener {
                 .collect(Collectors.toList());
     }
 
-    private CountDownTimer createClockTimer(int countdownSec, boolean startTrainingOnFinish) {
+    private CountDownTimer createClockTimer(int countdownSec, boolean startTrainingOnFinish, Exercise exercise) {
         return new CountDownTimer(countdownSec * 1_000L, 1_000L) {
 
             @Override
             public void onTick(long millisUntilFinished) {
-                CharSequence remainingSeconds = String.valueOf((millisUntilFinished + 1_000L) / 1_000L);
-                startCountDownText.setText(remainingSeconds);
             }
 
             @Override
             public void onFinish() {
                 if (startTrainingOnFinish) {
-                    trainingTimer = createTrainingTimer(10);
+                    trainingTimer = createTrainingTimer(10, exercise);
                     trainingTimer.start();
                 }
             }

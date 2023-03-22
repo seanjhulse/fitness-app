@@ -3,18 +3,30 @@ package csuci.seanhulse.fitness.db;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.ForeignKey;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import java.util.List;
 import java.util.UUID;
 
-@Entity
+@Entity(
+        foreignKeys = {
+                @ForeignKey(
+                        entity = Pose.class,
+                        parentColumns = "id",
+                        childColumns = "exercise_id"
+                )
+        }
+)
 public class Pose {
 
     @PrimaryKey
     @NonNull
     private UUID id;
+
+    @ColumnInfo(name = "exercise_id")
+    public UUID exerciseId;
 
     @ColumnInfo(name = "datetime")
     private String datetime;
@@ -25,19 +37,16 @@ public class Pose {
     @ColumnInfo(name = "landmarks")
     private List<Landmark> landmarks;
 
-    @ColumnInfo(name = "exerciseName")
-    private String exerciseName;
-
     @Ignore
     public Pose() {
 
     }
 
-    public Pose(List<Landmark> landmarks, String datetime, String state, String exerciseName) {
+    public Pose(List<Landmark> landmarks, String datetime, String state, UUID exerciseId) {
         this.landmarks = landmarks;
         this.datetime = datetime;
         this.state = state;
-        this.exerciseName = exerciseName;
+        this.exerciseId = exerciseId;
     }
 
     @NonNull
@@ -57,23 +66,12 @@ public class Pose {
         return datetime;
     }
 
-    public String getExerciseName() {
-        return exerciseName;
-    }
-
-    public void setDatetime(String datetime) {
-        this.datetime = datetime;
-    }
-
-    public void setLandmarks(List<Landmark> landmarks) {
-        this.landmarks = landmarks;
+    public UUID getExerciseId() {
+        return exerciseId;
     }
 
     public String getState() {
         return state;
     }
 
-    public void setState(String state) {
-        this.state = state;
-    }
 }
