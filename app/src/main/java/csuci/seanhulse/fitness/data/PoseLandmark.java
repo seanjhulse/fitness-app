@@ -1,4 +1,4 @@
-package csuci.seanhulse.fitness;
+package csuci.seanhulse.fitness.data;
 
 import org.jetbrains.annotations.NotNull;
 

@@ -25,6 +25,7 @@ import com.google.android.material.navigation.NavigationBarView;
 import csuci.seanhulse.fitness.camera.CameraManager;
 import csuci.seanhulse.fitness.data.PoseDataManager;
 import csuci.seanhulse.fitness.databinding.ActivityMainBinding;
+import csuci.seanhulse.fitness.home.HomeFragment;
 import csuci.seanhulse.fitness.training.TrainingFragment;
 import csuci.seanhulse.fitness.training.TrainingManager;
 import csuci.seanhulse.fitness.workouts.WorkoutsFragment;

@@ -8,9 +8,10 @@ import android.view.ViewGroup;
 import androidx.fragment.app.Fragment;
 
 import csuci.seanhulse.fitness.R;
+import csuci.seanhulse.fitness.home.HomeFragment;
 
 /**
- * A simple {@link Fragment} subclass. Use the {@link csuci.seanhulse.fitness.HomeFragment#newInstance} factory method
+ * A simple {@link Fragment} subclass. Use the {@link HomeFragment#newInstance} factory method
  * to create an instance of this fragment.
  */
 public class WorkoutsFragment extends Fragment {
@@ -36,8 +37,8 @@ public class WorkoutsFragment extends Fragment {
      * @return A new instance of fragment HomeFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static csuci.seanhulse.fitness.HomeFragment newInstance(String param1, String param2) {
-        csuci.seanhulse.fitness.HomeFragment fragment = new csuci.seanhulse.fitness.HomeFragment();
+    public static HomeFragment newInstance(String param1, String param2) {
+        HomeFragment fragment = new HomeFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);

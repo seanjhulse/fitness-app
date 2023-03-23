@@ -44,22 +44,31 @@ public class PreviousExerciseFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_previous_exercise, container, false);
 
         Context context = inflater.getContext();
-        PoseDatabase db = Room
+        this.db = Room
                 .databaseBuilder(context, PoseDatabase.class, "pose-database")
                 .fallbackToDestructiveMigration()
                 .build();
 
+        initializeRadioButtons(view);
+
+        return view;
+    }
+
+    /**
+     * Gets the Exercises from the databases and creates a radio button for each one.
+     *
+     * @param view the root view to access elements and context
+     */
+    private void initializeRadioButtons(View view) {
         Executor executor = Executors.newSingleThreadExecutor();
-
         Handler handler = new Handler(Looper.getMainLooper());
-        executor.execute(() -> {
-            //Background work here
 
-        });
+        // Runs off the UI thread
         executor.execute(() -> {
             exercises = db.exerciseDao().loadAll();
             RadioGroup previousExercisesRadioGroup = view.findViewById(R.id.previousExercisesRadioGroup);
 
+            // Runs on the UI thread
             handler.post(() -> {
                 exercises.forEach(exercise -> {
                     RadioButton radioButton = new RadioButton(view.getContext());
@@ -67,10 +76,7 @@ public class PreviousExerciseFragment extends Fragment {
                     previousExercisesRadioGroup.addView(radioButton);
                 });
             });
-
         });
-
-        return view;
     }
 
 }

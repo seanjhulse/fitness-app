@@ -96,7 +96,7 @@ public class PoseGraphic extends Graphic {
       float classificationY =
         (canvas.getHeight()
           - POSE_CLASSIFICATION_TEXT_SIZE * 1.5f * (poseClassification.size() - i));
-      String landmarkType = csuci.seanhulse.fitness.PoseLandmark.valueOf(poseClassification.get(i).getLandmarkType()).name();
+      String landmarkType = csuci.seanhulse.fitness.data.PoseLandmark.valueOf(poseClassification.get(i).getLandmarkType()).name();
       canvas.drawText(landmarkType, classificationX, classificationY, classificationTextPaint);
     }
 
