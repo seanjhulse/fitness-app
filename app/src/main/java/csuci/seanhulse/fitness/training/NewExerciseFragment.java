@@ -73,6 +73,10 @@ public class NewExerciseFragment extends Fragment {
 
         saveExercise(name, Integer.parseInt(reps));
 
+        closeFragment();
+    }
+
+    private void closeFragment() {
         final FragmentActivity fragmentActivity = getActivity();
         if (fragmentActivity != null) {
             fragmentActivity.getSupportFragmentManager().popBackStack();
