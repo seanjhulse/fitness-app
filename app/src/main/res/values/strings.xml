@@ -18,12 +18,12 @@
     <string name="workouts_description">Workouts</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="form_new_exercise_description">Training a new exercise is easy. Just give it a name (e.g. squats, curls, push-ups, etc.) and input the number of reps. Remember, the number of reps should be between 10 and 25 since this is training data for our AI algorithm. You should consider doing multiple sets to help improve the training data.</string>
-    <string name="form_previous_exercise_title">Previous exercise</string>
+    <string name="form_previous_exercise_title">Start Training</string>
     <string name="form_new_exercise_title">New exercise</string>
     <string name="form_exercise_name_label">What\'s the name of your new exercise?</string>
     <string name="form_exercise_reps_label">Number of reps per set</string>
     <string name="form_exercise_reps_default_value">0</string>
     <string name="form_exercise_create_button_label">Create</string>
-    <string name="train_a_previous_exercise_button_description">Train a previous exercise</string>
-    <string name="train_a_new_exercise_button_description">Train a new exercise</string>
+    <string name="train_a_previous_exercise_button_description">Train an exercise</string>
+    <string name="train_a_new_exercise_button_description">Create a new exercise</string>
 </resources>

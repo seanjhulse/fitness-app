@@ -72,7 +72,9 @@ public class PreviousExerciseFragment extends Fragment {
             handler.post(() -> {
                 exercises.forEach(exercise -> {
                     RadioButton radioButton = new RadioButton(view.getContext());
-                    radioButton.setText(exercise.getName());
+                    String exerciseText = String.format("%s - %s reps", exercise.getName(), exercise.getReps());
+                    radioButton.setText(exerciseText);
+                    radioButton.setTextSize(18);
                     previousExercisesRadioGroup.addView(radioButton);
                 });
             });

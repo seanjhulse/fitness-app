@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.room.Room;
 
 import java.text.DateFormat;
@@ -71,6 +72,11 @@ public class NewExerciseFragment extends Fragment {
         }
 
         saveExercise(name, Integer.parseInt(reps));
+
+        final FragmentActivity fragmentActivity = getActivity();
+        if (fragmentActivity != null) {
+            fragmentActivity.getSupportFragmentManager().popBackStack();
+        }
     }
 
     private void saveExercise(String name, int reps) {
