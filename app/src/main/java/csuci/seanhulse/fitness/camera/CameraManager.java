@@ -22,8 +22,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import csuci.seanhulse.fitness.data.PoseDataManager;
-
 /**
  * Manages the camera authorization, processes, and aspect ratio.
  *
@@ -33,23 +31,20 @@ public class CameraManager {
     private final static int REQUEST_CODE_PERMISSIONS = 42;
     private final static String[] REQUIRED_PERMISSIONS = {permission.CAMERA};
     private final AppCompatActivity owner;
-    private final PreviewView cameraView;
     private final Context context;
     private final ExecutorService cameraExecutor = Executors.newSingleThreadExecutor();
-    private final PoseDataManager poseDataManager;
-
     private ProcessCameraProvider cameraProvider;
+    private Preview preview;
+    private Analyzer analyzer;
 
-    public CameraManager(AppCompatActivity owner, Context context, PreviewView cameraView, PoseDataManager poseDataManager) {
+    public CameraManager(AppCompatActivity owner, Context context) {
         this.owner = owner;
         this.context = context;
-        this.cameraView = cameraView;
-        this.poseDataManager = poseDataManager;
     }
 
-    public void start() {
+    public void start(PreviewView previewView) {
         if (allPermissionsGranted()) {
-            startCamera();
+            startCamera(previewView);
         } else {
             ActivityCompat.requestPermissions(owner, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS);
         }
@@ -59,11 +54,11 @@ public class CameraManager {
         cameraExecutor.shutdown();
     }
 
-    public boolean isShutdown() {
-        return cameraExecutor.isShutdown();
+    public void setAnalyzer(Analyzer analyzer) {
+        this.analyzer = analyzer;
     }
 
-    private void startCamera() {
+    private void startCamera(PreviewView view) {
         ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(context);
         cameraProviderFuture.addListener(() -> {
 
@@ -74,6 +69,7 @@ public class CameraManager {
             }
 
             bindCameraUseCases();
+            preview.setSurfaceProvider(view.getSurfaceProvider());
         }, ContextCompat.getMainExecutor(context));
     }
 
@@ -91,20 +87,19 @@ public class CameraManager {
         CameraSelector cameraSelector = new CameraSelector.Builder()
                 .requireLensFacing(lensFacing)
                 .build();
-        Preview previewView = getPreviewUseCase(cameraSelector);
+        preview = getPreviewUseCase(cameraSelector);
         UseCase poseDetector = createImageAnalysisUseCase();
 
         cameraProvider.unbindAll();
 
-        cameraProvider.bindToLifecycle(owner, cameraSelector, previewView, poseDetector);
+        cameraProvider.bindToLifecycle(owner, cameraSelector, preview, poseDetector);
 
-        previewView.setSurfaceProvider(cameraView.getSurfaceProvider());
     }
 
     private UseCase createImageAnalysisUseCase() {
-        ImageAnalysis analyzer = new ImageAnalysis.Builder().build();
-        analyzer.setAnalyzer(cameraExecutor, new Analyzer(poseDataManager, true));
-        return analyzer;
+        ImageAnalysis imageAnalysis = new ImageAnalysis.Builder().build();
+        imageAnalysis.setAnalyzer(cameraExecutor, analyzer);
+        return imageAnalysis;
     }
 
     @SuppressLint("RestrictedApi")

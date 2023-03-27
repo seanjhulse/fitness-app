@@ -7,6 +7,7 @@ import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
@@ -28,6 +29,7 @@ import csuci.seanhulse.fitness.db.PoseDatabase;
 public class PreviousExerciseFragment extends Fragment {
     private PoseDatabase db;
     private Collection<Exercise> exercises;
+    private Exercise checkedExercise;
 
     public PreviousExerciseFragment() {
     }
@@ -38,20 +40,23 @@ public class PreviousExerciseFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_previous_exercise, container, false);
 
         Context context = inflater.getContext();
-        this.db = Room
-                .databaseBuilder(context, PoseDatabase.class, "pose-database")
-                .fallbackToDestructiveMigration()
-                .build();
+        this.db = Room.databaseBuilder(context, PoseDatabase.class,
+                "pose-database").fallbackToDestructiveMigration().build();
 
         initializeRadioButtons(view);
 
+        Button button = view.findViewById(R.id.startTrainingExerciseButton);
+        button.setOnClickListener(this::loadTrainingScreen);
         return view;
+    }
+
+    private void loadTrainingScreen(View view) {
+        loadFragment(new TrainingFragment(checkedExercise));
     }
 
     /**
@@ -75,10 +80,20 @@ public class PreviousExerciseFragment extends Fragment {
                     String exerciseText = String.format("%s - %s reps", exercise.getName(), exercise.getReps());
                     radioButton.setText(exerciseText);
                     radioButton.setTextSize(18);
+                    radioButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                        if (isChecked) {
+                            checkedExercise = exercise;
+                        }
+                    });
                     previousExercisesRadioGroup.addView(radioButton);
                 });
             });
         });
+    }
+
+    void loadFragment(Fragment fragment) {
+        getParentFragmentManager().beginTransaction().replace(R.id.relativeLayout, fragment).addToBackStack(
+                fragment.getTag()).commit();
     }
 
 }

@@ -9,7 +9,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="25dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        tools:ignore="UselessParent">
 
         <TextView
             android:layout_width="wrap_content"
@@ -21,8 +22,16 @@
         <RadioGroup
             android:id="@+id/previousExercisesRadioGroup"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-        />
+            android:layout_height="match_parent">
+
+        </RadioGroup>
+
+        <Button
+            android:id="@+id/startTrainingExerciseButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/start_training_button_text" />
     </LinearLayout>
 
 </RelativeLayout>
