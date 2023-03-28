@@ -22,6 +22,12 @@ public class Exercise {
     @ColumnInfo(name = "reps")
     private int reps;
 
+    @ColumnInfo(name = "level")
+    private Level level;
+
+    @ColumnInfo(name = "sessions")
+    private int sessions;
+
     @NonNull
     public UUID getId() {
         return id;
@@ -31,11 +37,13 @@ public class Exercise {
         this.id = id;
     }
 
-    public Exercise(String datetime, String name, int reps) {
+    public Exercise(String datetime, String name, int reps, Level level, int sessions) {
         this.id = UUID.randomUUID();
         this.datetime = datetime;
         this.name = name;
         this.reps = reps;
+        this.level = level;
+        this.sessions = sessions;
     }
 
     public String getDatetime() {
@@ -48,5 +56,13 @@ public class Exercise {
 
     public int getReps() {
         return reps;
+    }
+
+    public Level getLevel() {
+        return level;
+    }
+
+    public int getSessions() {
+        return sessions;
     }
 }

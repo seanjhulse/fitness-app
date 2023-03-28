@@ -29,13 +29,12 @@ import csuci.seanhulse.fitness.workouts.WorkoutsFragment;
 public class MainActivity extends AppCompatActivity implements NavigationBarView.OnItemSelectedListener {
     private final PoseDataManager poseDataManager = new PoseDataManager();
     private CameraManager cameraManager;
-    private BottomNavigationView bottomNavigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
         bottomNavigationView.setOnItemSelectedListener(this);
         cameraManager = new CameraManager(this, getApplicationContext());
         cameraManager.setAnalyzer(new Analyzer(poseDataManager, true));

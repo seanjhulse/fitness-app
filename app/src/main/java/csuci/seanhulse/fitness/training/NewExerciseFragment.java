@@ -21,6 +21,7 @@ import java.util.Date;
 
 import csuci.seanhulse.fitness.R;
 import csuci.seanhulse.fitness.db.Exercise;
+import csuci.seanhulse.fitness.db.Level;
 import csuci.seanhulse.fitness.db.PoseDatabase;
 
 /**
@@ -71,7 +72,7 @@ public class NewExerciseFragment extends Fragment {
             return;
         }
 
-        saveExercise(name, Integer.parseInt(reps));
+        createExercise(name, Integer.parseInt(reps));
 
         closeFragment();
     }
@@ -83,9 +84,11 @@ public class NewExerciseFragment extends Fragment {
         }
     }
 
-    private void saveExercise(String name, int reps) {
+    private void createExercise(String name, int reps) {
         String nowAsString = df.format(new Date());
-        Exercise exercise = new Exercise(nowAsString, name, reps);
+        
+        // Initialize the exercise as Level.LOW and sessions 0
+        Exercise exercise = new Exercise(nowAsString, name, reps, Level.LOW, 0);
         AsyncTask.execute(() -> db.exerciseDao().insert(exercise));
     }
 

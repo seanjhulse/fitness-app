@@ -1,6 +1,7 @@
 package csuci.seanhulse.fitness.training;
 
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -48,15 +49,14 @@ public class PreviousExerciseFragment extends Fragment {
         this.db = Room.databaseBuilder(context, PoseDatabase.class,
                 "pose-database").fallbackToDestructiveMigration().build();
 
-        initializeRadioButtons(view);
-
-        Button button = view.findViewById(R.id.startTrainingExerciseButton);
-        button.setOnClickListener(this::loadTrainingScreen);
+        initializeExerciseButtons(view);
         return view;
     }
 
     private void loadTrainingScreen(View view) {
-        loadFragment(new TrainingFragment(checkedExercise));
+        if (checkedExercise != null) {
+            loadFragment(new TrainingFragment(checkedExercise));
+        }
     }
 
     /**
@@ -64,7 +64,7 @@ public class PreviousExerciseFragment extends Fragment {
      *
      * @param view the root view to access elements and context
      */
-    private void initializeRadioButtons(View view) {
+    private void initializeExerciseButtons(View view) {
         Executor executor = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
 
@@ -87,6 +87,14 @@ public class PreviousExerciseFragment extends Fragment {
                     });
                     previousExercisesRadioGroup.addView(radioButton);
                 });
+
+                // Initialize the "start" button
+                Button button = view.findViewById(R.id.startTrainingExerciseButton);
+                button.setOnClickListener(this::loadTrainingScreen);
+                button.setEnabled(!exercises.isEmpty());
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    button.setAllowClickWhenDisabled(false);
+                }
             });
         });
     }
