@@ -128,6 +128,8 @@ public class TrainingFragment extends Fragment {
 
     /**
      * Start the training based on the {@link Level} of the exercise.
+     *
+     * @param view the {@link View} with which we are drawing on
      */
     private void toggleTraining(View view) {
         isTraining = !isTraining;
@@ -176,6 +178,8 @@ public class TrainingFragment extends Fragment {
     /**
      * Low level training is going to capture "UP" and "DOWN" information for the exercise in order to create the KNN
      * classifier for automatically detect that.
+     *
+     * @param view the {@link View} with which we are drawing on
      */
     private void lowLevelTraining(View view) {
         repState = RepState.DOWN;
