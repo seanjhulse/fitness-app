@@ -16,7 +16,7 @@ public interface PoseDao {
     void insertAll(Pose... poses);
 
     @Insert
-    void insert(Pose pose);
+    long insert(Pose pose);
 
     @Delete
     void delete(Pose pose);

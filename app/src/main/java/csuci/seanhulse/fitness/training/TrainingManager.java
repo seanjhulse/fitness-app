@@ -143,7 +143,7 @@ public class TrainingManager extends LinearLayout implements IPoseDataListener {
                         if (!landmarks.isEmpty()) {
                             String nowAsString = df.format(new Date());
                             csuci.seanhulse.fitness.db.Pose pose =
-                                    new csuci.seanhulse.fitness.db.Pose(UUID.randomUUID(), landmarks,
+                                    new csuci.seanhulse.fitness.db.Pose(landmarks,
                                             nowAsString, repState.toString(), exercise.getId());
 
                             // Insert pose into the database
@@ -167,7 +167,7 @@ public class TrainingManager extends LinearLayout implements IPoseDataListener {
     }
 
     private void uploadPoseToS3(csuci.seanhulse.fitness.db.Pose pose) {
-        final File file = new File(context.getFilesDir(), pose.getId().toString());
+        final File file = new File(context.getFilesDir(), String.valueOf(pose.getId()));
 
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));

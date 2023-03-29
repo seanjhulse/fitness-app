@@ -1,6 +1,5 @@
 package csuci.seanhulse.fitness.db;
 
-import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
@@ -8,12 +7,11 @@ import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import java.util.List;
-import java.util.UUID;
 
 @Entity(
         foreignKeys = {
                 @ForeignKey(
-                        entity = Pose.class,
+                        entity = Exercise.class,
                         parentColumns = "id",
                         childColumns = "exercise_id"
                 )
@@ -21,12 +19,11 @@ import java.util.UUID;
 )
 public class Pose {
 
-    @PrimaryKey
-    @NonNull
-    private UUID id;
+    @PrimaryKey(autoGenerate = true)
+    private long id;
 
     @ColumnInfo(name = "exercise_id")
-    public UUID exerciseId;
+    public long exerciseId;
 
     @ColumnInfo(name = "datetime")
     private String datetime;
@@ -42,8 +39,7 @@ public class Pose {
 
     }
 
-    public Pose(UUID id, List<Landmark> landmarks, String datetime, String state, UUID exerciseId) {
-        this.id = id;
+    public Pose(List<Landmark> landmarks, String datetime, String state, long exerciseId) {
         this.landmarks = landmarks;
         this.datetime = datetime;
         this.state = state;
@@ -58,7 +54,7 @@ public class Pose {
         return datetime;
     }
 
-    public UUID getExerciseId() {
+    public long getExerciseId() {
         return exerciseId;
     }
 
@@ -66,7 +62,11 @@ public class Pose {
         return state;
     }
 
-    public UUID getId() {
+    public long getId() {
         return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 }

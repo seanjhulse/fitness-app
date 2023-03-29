@@ -1,17 +1,13 @@
 package csuci.seanhulse.fitness.db;
 
-import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-import java.util.UUID;
-
 @Entity
 public class Exercise {
-    @PrimaryKey
-    @NonNull
-    private UUID id;
+    @PrimaryKey(autoGenerate = true)
+    private long id;
 
     @ColumnInfo(name = "datetime")
     private String datetime;
@@ -28,17 +24,11 @@ public class Exercise {
     @ColumnInfo(name = "sessions")
     private int sessions;
 
-    @NonNull
-    public UUID getId() {
+    public long getId() {
         return id;
     }
 
-    public void setId(@NonNull UUID id) {
-        this.id = id;
-    }
-
     public Exercise(String datetime, String name, int reps, Level level, int sessions) {
-        this.id = UUID.randomUUID();
         this.datetime = datetime;
         this.name = name;
         this.reps = reps;
@@ -64,5 +54,9 @@ public class Exercise {
 
     public int getSessions() {
         return sessions;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 }

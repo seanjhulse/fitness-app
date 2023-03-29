@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,16 +21,20 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.room.Room;
 
+import com.amplifyframework.core.Amplify;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.gson.Gson;
 import com.google.mlkit.vision.common.PointF3D;
 import com.google.mlkit.vision.pose.Pose;
 import com.google.mlkit.vision.pose.PoseLandmark;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import csuci.seanhulse.fitness.MainActivity;
@@ -50,6 +55,7 @@ public class TrainingFragment extends Fragment {
     @SuppressLint("SimpleDateFormat")
     private static final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mmZ");
     private static final float IN_FRAME_LIKELIHOOD_VALUE = 0.90f;
+    private static final Gson gson = new Gson();
     private final Exercise exercise;
     private final ProgressBarRunnable progressBarRunnable = new ProgressBarRunnable(new Handler());
     private boolean isTraining = false;
@@ -64,6 +70,7 @@ public class TrainingFragment extends Fragment {
     private TextView trainingRepsText;
     private PoseDataManager poseDataManager;
     private PoseDatabase db;
+    private Context context;
 
     private enum RepState {UP, DOWN}
 
@@ -78,7 +85,7 @@ public class TrainingFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Context context = inflater.getContext();
+        this.context = inflater.getContext();
 
         // Setup the database
         this.db = Room
@@ -91,6 +98,7 @@ public class TrainingFragment extends Fragment {
 
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_training, container, false);
+
         ProgressBar progressBar = view.findViewById(R.id.progressBar);
         progressBarRunnable.setProgressBar(progressBar);
         progressText = view.findViewById(R.id.progressText);
@@ -230,13 +238,16 @@ public class TrainingFragment extends Fragment {
             List<Landmark> landmarks = createDbLandmarkFromPose(mlPose.getAllPoseLandmarks());
 
             csuci.seanhulse.fitness.db.Pose pose = new csuci.seanhulse.fitness.db.Pose(
-                    UUID.randomUUID(),
                     landmarks,
                     df.format(new Date()),
                     repState.toString(),
                     exercise.getId()
             );
-            db.poseDao().insert(pose);
+
+            long id = db.poseDao().insert(pose);
+            pose.setId(id);
+
+            uploadPoseToS3(pose);
         });
     }
 
@@ -266,6 +277,25 @@ public class TrainingFragment extends Fragment {
                             landmark.getInFrameLikelihood());
                 })
                 .collect(Collectors.toList());
+    }
+
+    private void uploadPoseToS3(csuci.seanhulse.fitness.db.Pose pose) {
+        final File file = new File(context.getFilesDir(), String.valueOf(pose.getId()));
+
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            writer.append(gson.toJson(pose));
+            writer.close();
+            Amplify.Storage.uploadFile(String.format("%s-%s/%s.json", exercise.getName(), exercise.getId(),
+                            pose.getId()),
+                    file,
+                    result -> Log.i("Training upload", "Successfully uploaded: " + result.getKey()),
+                    storageFailure -> Log.e("Training upload", "Upload failed", storageFailure)
+            );
+        } catch (Exception exception) {
+            Log.e("Training upload", "Upload failed", exception);
+        }
+
     }
 
     /**
