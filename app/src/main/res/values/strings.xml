@@ -28,4 +28,5 @@
     <string name="train_a_new_exercise_button_description">Create a new exercise</string>
     <string name="training_title_text">Training</string>
     <string name="start_training_button_text">Start Training</string>
+    <string name="finishedTrainingRepsText">Finished</string>
 </resources>
