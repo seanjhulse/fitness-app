@@ -38,12 +38,10 @@ public class TrainingFragment extends Fragment {
     private Drawable stopIcon;
     private ColorStateList backgroundTintList;
     private CountDownTimer countDownTimer;
-    private ProgressBar progressBar;
     private TextView progressText;
     private RepState repState = RepState.DOWN;
     private long countDownTimeMs = -1L;
     private int numRepsRemaining = -1;
-    private int progress = 0;
     private TextView trainingRepsText;
 
     private enum RepState {UP, DOWN}
@@ -66,7 +64,8 @@ public class TrainingFragment extends Fragment {
 
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_training, container, false);
-        progressBar = view.findViewById(R.id.progressBar);
+        ProgressBar progressBar = view.findViewById(R.id.progressBar);
+        progressBarRunnable.setProgressBar(progressBar);
         progressText = view.findViewById(R.id.progressText);
 
         PreviewView cameraSurface = view.findViewById(R.id.cameraSurface);
@@ -99,7 +98,7 @@ public class TrainingFragment extends Fragment {
         if (isTraining) {
             switch (exercise.getLevel()) {
                 case LOW:
-                    lowLevelTraining();
+                    lowLevelTraining(view);
                     break;
                 case MEDIUM:
                     mediumLevelTraining();
@@ -139,7 +138,7 @@ public class TrainingFragment extends Fragment {
      * Low level training is going to capture "UP" and "DOWN" information for the exercise in order to create the KNN
      * classifier for automatically detect that.
      */
-    private void lowLevelTraining() {
+    private void lowLevelTraining(View view) {
         repState = RepState.DOWN;
 
         // Set the number of reps remaining if we haven't canceled our timer
@@ -149,9 +148,7 @@ public class TrainingFragment extends Fragment {
 
         // # of reps remaining * interval for each up/down state * 2 (because we are counting up AND down)
         final int repCountdownSec = numRepsRemaining * INTERVAL_SEC * 2;
-
-        this.countDownTimer = createUpDownCountdownTimer(repCountdownSec);
-
+        countDownTimer = createUpDownCountdownTimer(view, repCountdownSec);
         countDownTimer.start();
     }
 
@@ -162,7 +159,7 @@ public class TrainingFragment extends Fragment {
      * @param repCountdownSec the number of seconds per Up or Down part of the rep
      * @return the {@link CountDownTimer}
      */
-    private CountDownTimer createUpDownCountdownTimer(int repCountdownSec) {
+    private CountDownTimer createUpDownCountdownTimer(View view, int repCountdownSec) {
         return new CountDownTimer(repCountdownSec * 1_000L, INTERVAL_SEC * 1_000L) {
 
             @Override
@@ -170,7 +167,6 @@ public class TrainingFragment extends Fragment {
                 countDownTimeMs = millisUntilFinished;
 
                 repState = repState == RepState.UP ? RepState.DOWN : RepState.UP;
-
                 progressText.setText(repState.toString());
 
                 if (repState == RepState.UP) {
@@ -180,10 +176,6 @@ public class TrainingFragment extends Fragment {
 
                 progressBarRunnable.setDelay(INTERVAL_SEC);
                 progressBarRunnable.start();
-
-                int totalMs = repCountdownSec * 1_000;
-                float progress = (millisUntilFinished / (float) totalMs) * 100;
-                progressBar.setProgress(Math.round(progress));
             }
 
             @Override
@@ -191,6 +183,7 @@ public class TrainingFragment extends Fragment {
                 trainingRepsText.setText(R.string.finishedTrainingRepsText);
                 progressText.setText("---");
                 progressBarRunnable.cancel();
+                toggleTraining(view);
             }
         };
     }
@@ -211,10 +204,12 @@ public class TrainingFragment extends Fragment {
     /**
      * Progress bar which counts down until the progress reaches "100". The progress counts at a rate of delayMs.
      */
-    private class ProgressBarRunnable implements Runnable {
+    private static class ProgressBarRunnable implements Runnable {
         private final Handler handler;
         private long delayMs;
+        private int progress = 0;
         private boolean isRunning = false;
+        private ProgressBar progressBar;
 
         private ProgressBarRunnable(Handler handler) {
             this.handler = handler;
@@ -243,6 +238,7 @@ public class TrainingFragment extends Fragment {
                 handler.postDelayed(this, delayMs);
             } else {
                 progress = 0;
+                progressBar.setProgress(progress);
                 handler.removeCallbacks(this);
                 isRunning = false;
             }
@@ -256,6 +252,10 @@ public class TrainingFragment extends Fragment {
 
         public boolean isRunning() {
             return isRunning;
+        }
+
+        public void setProgressBar(ProgressBar progressBar) {
+            this.progressBar = progressBar;
         }
     }
 
