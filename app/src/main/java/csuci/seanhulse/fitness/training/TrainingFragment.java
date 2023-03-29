@@ -231,7 +231,7 @@ public class TrainingFragment extends Fragment {
     }
 
     /**
-     * Saves the provides {@link Pose} to the database.
+     * Saves the provided {@link Pose} to the database.
      *
      * @param mlPose {@link Pose} the ML pose created by Google's ML Kit
      */
