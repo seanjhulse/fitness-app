@@ -22,6 +22,8 @@ import androidx.fragment.app.Fragment;
 import androidx.room.Room;
 
 import com.amplifyframework.core.Amplify;
+import com.amplifyframework.storage.StorageException;
+import com.amplifyframework.storage.result.StorageUploadFileResult;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 import com.google.mlkit.vision.common.PointF3D;
@@ -279,23 +281,46 @@ public class TrainingFragment extends Fragment {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Uploads a {@link csuci.seanhulse.fitness.db.Pose} to an S3 bucket.
+     *
+     * @param pose the pose we are uploading
+     */
     private void uploadPoseToS3(csuci.seanhulse.fitness.db.Pose pose) {
         final File file = new File(context.getFilesDir(), String.valueOf(pose.getId()));
 
         try {
+            String exerciseName = exercise.getName().toLowerCase();
+            long exerciseId = exercise.getId();
+            String fileName = String.format("%s-%s/%s.json", exerciseName, exerciseId, pose.getId());
+
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
             writer.append(gson.toJson(pose));
             writer.close();
-            Amplify.Storage.uploadFile(String.format("%s-%s/%s.json", exercise.getName(), exercise.getId(),
-                            pose.getId()),
-                    file,
-                    result -> Log.i("Training upload", "Successfully uploaded: " + result.getKey()),
-                    storageFailure -> Log.e("Training upload", "Upload failed", storageFailure)
-            );
+
+            Amplify.Storage.uploadFile(fileName, file, this::getTrainingUpload, this::uploadError);
         } catch (Exception exception) {
             Log.e("Training upload", "Upload failed", exception);
         }
 
+    }
+
+    /**
+     * Handler for upload errors to the Amplify AWS S3 bucket.
+     *
+     * @param storageFailure the exception during upload
+     */
+    private void uploadError(StorageException storageFailure) {
+        Log.e("Training upload", "Upload failed", storageFailure);
+    }
+
+    /**
+     * Handler for successful uploads to the Amplify AWS S3 bucket.
+     *
+     * @param result the response on a successful upload
+     */
+    private void getTrainingUpload(StorageUploadFileResult result) {
+        Log.i("Training upload", "Successfully uploaded: " + result.getKey());
     }
 
     /**
