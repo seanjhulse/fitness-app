@@ -1,8 +1,10 @@
 package csuci.seanhulse.fitness.training;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -16,14 +18,28 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.camera.view.PreviewView;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.room.Room;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.mlkit.vision.common.PointF3D;
+import com.google.mlkit.vision.pose.Pose;
+import com.google.mlkit.vision.pose.PoseLandmark;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import csuci.seanhulse.fitness.MainActivity;
 import csuci.seanhulse.fitness.R;
 import csuci.seanhulse.fitness.camera.CameraManager;
+import csuci.seanhulse.fitness.data.PoseDataManager;
 import csuci.seanhulse.fitness.db.Exercise;
+import csuci.seanhulse.fitness.db.Landmark;
 import csuci.seanhulse.fitness.db.Level;
+import csuci.seanhulse.fitness.db.PoseDatabase;
 
 /**
  * A simple {@link Fragment} subclass. Use the {@link TrainingFragment} factory method to create an instance of this
@@ -31,6 +47,9 @@ import csuci.seanhulse.fitness.db.Level;
  */
 public class TrainingFragment extends Fragment {
     public static final int INTERVAL_SEC = 2;
+    @SuppressLint("SimpleDateFormat")
+    private static final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mmZ");
+    private static final float IN_FRAME_LIKELIHOOD_VALUE = 0.90f;
     private final Exercise exercise;
     private final ProgressBarRunnable progressBarRunnable = new ProgressBarRunnable(new Handler());
     private boolean isTraining = false;
@@ -43,6 +62,8 @@ public class TrainingFragment extends Fragment {
     private long countDownTimeMs = -1L;
     private int numRepsRemaining = -1;
     private TextView trainingRepsText;
+    private PoseDataManager poseDataManager;
+    private PoseDatabase db;
 
     private enum RepState {UP, DOWN}
 
@@ -58,6 +79,12 @@ public class TrainingFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Context context = inflater.getContext();
+
+        // Setup the database
+        this.db = Room
+                .databaseBuilder(context, PoseDatabase.class, "pose-database")
+                .fallbackToDestructiveMigration()
+                .build();
 
         MainActivity activity = (MainActivity) context;
         CameraManager cameraManager = activity.getCameraManager();
@@ -80,6 +107,8 @@ public class TrainingFragment extends Fragment {
 
         trainingRepsText = view.findViewById(R.id.trainingRepsText);
         trainingRepsText.setText(String.format("%s reps", exercise.getReps()));
+
+        poseDataManager = ((MainActivity) context).getPoseDataManager();
 
         this.startIcon = AppCompatResources.getDrawable(context, R.drawable.baseline_play_arrow_24);
         this.stopIcon = AppCompatResources.getDrawable(context, R.drawable.baseline_stop_24);
@@ -167,6 +196,9 @@ public class TrainingFragment extends Fragment {
                 countDownTimeMs = millisUntilFinished;
 
                 repState = repState == RepState.UP ? RepState.DOWN : RepState.UP;
+
+                savePose(poseDataManager.getPose());
+
                 progressText.setText(repState.toString());
 
                 if (repState == RepState.UP) {
@@ -189,6 +221,26 @@ public class TrainingFragment extends Fragment {
     }
 
     /**
+     * Saves the provides {@link Pose} to the database.
+     *
+     * @param mlPose {@link Pose} the ML pose created by Google's ML Kit
+     */
+    private void savePose(Pose mlPose) {
+        AsyncTask.execute(() -> {
+            List<Landmark> landmarks = createDbLandmarkFromPose(mlPose.getAllPoseLandmarks());
+
+            csuci.seanhulse.fitness.db.Pose pose = new csuci.seanhulse.fitness.db.Pose(
+                    UUID.randomUUID(),
+                    landmarks,
+                    df.format(new Date()),
+                    repState.toString(),
+                    exercise.getId()
+            );
+            db.poseDao().insert(pose);
+        });
+    }
+
+    /**
      * Medium level training is going to try to capture the exercise and the transitions between "UP" and "DOWN"
      * information.
      */
@@ -199,6 +251,21 @@ public class TrainingFragment extends Fragment {
      * High level training is going to refine the transition and pose data even further than medium training.
      */
     private void highLevelTraining() {
+    }
+
+    private List<Landmark> createDbLandmarkFromPose(List<PoseLandmark> poseLandmarks) {
+        return poseLandmarks
+                .stream()
+                .filter(landmark -> landmark.getInFrameLikelihood() > IN_FRAME_LIKELIHOOD_VALUE)
+                .map(landmark -> {
+                    PointF3D position = landmark.getPosition3D();
+                    return new Landmark(position.getX(),
+                            position.getY(),
+                            position.getZ(),
+                            landmark.getLandmarkType(),
+                            landmark.getInFrameLikelihood());
+                })
+                .collect(Collectors.toList());
     }
 
     /**

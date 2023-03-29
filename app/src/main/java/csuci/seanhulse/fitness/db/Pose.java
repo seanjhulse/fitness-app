@@ -42,20 +42,12 @@ public class Pose {
 
     }
 
-    public Pose(List<Landmark> landmarks, String datetime, String state, UUID exerciseId) {
+    public Pose(UUID id, List<Landmark> landmarks, String datetime, String state, UUID exerciseId) {
+        this.id = id;
         this.landmarks = landmarks;
         this.datetime = datetime;
         this.state = state;
         this.exerciseId = exerciseId;
-    }
-
-    @NonNull
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(@NonNull UUID id) {
-        this.id = id;
     }
 
     public List<Landmark> getLandmarks() {
@@ -74,4 +66,7 @@ public class Pose {
         return state;
     }
 
+    public UUID getId() {
+        return id;
+    }
 }

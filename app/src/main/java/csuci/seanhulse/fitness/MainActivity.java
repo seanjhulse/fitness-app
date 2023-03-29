@@ -94,4 +94,8 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
     public CameraManager getCameraManager() {
         return cameraManager;
     }
+
+    public PoseDataManager getPoseDataManager() {
+        return poseDataManager;
+    }
 }

@@ -10,9 +10,7 @@ import android.os.CountDownTimer;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
-import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.room.Room;
 
@@ -32,7 +30,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import csuci.seanhulse.fitness.R;
 import csuci.seanhulse.fitness.data.IPoseDataListener;
 import csuci.seanhulse.fitness.db.Exercise;
 import csuci.seanhulse.fitness.db.Landmark;
@@ -145,9 +142,9 @@ public class TrainingManager extends LinearLayout implements IPoseDataListener {
                         List<Landmark> landmarks = createDbLandmarkFromPose(pose.getAllPoseLandmarks());
                         if (!landmarks.isEmpty()) {
                             String nowAsString = df.format(new Date());
-                            csuci.seanhulse.fitness.db.Pose pose = new csuci.seanhulse.fitness.db.Pose(landmarks,
-                                    nowAsString, repState.toString(), exercise.getId());
-                            pose.setId(UUID.randomUUID());
+                            csuci.seanhulse.fitness.db.Pose pose =
+                                    new csuci.seanhulse.fitness.db.Pose(UUID.randomUUID(), landmarks,
+                                            nowAsString, repState.toString(), exercise.getId());
 
                             // Insert pose into the database
                             AsyncTask.execute(() -> {

@@ -19,7 +19,9 @@ import java.util.Collection;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+import csuci.seanhulse.fitness.MainActivity;
 import csuci.seanhulse.fitness.R;
+import csuci.seanhulse.fitness.data.PoseDataManager;
 import csuci.seanhulse.fitness.db.Exercise;
 import csuci.seanhulse.fitness.db.PoseDatabase;
 
@@ -31,9 +33,6 @@ public class PreviousExerciseFragment extends Fragment {
     private PoseDatabase db;
     private Collection<Exercise> exercises;
     private Exercise checkedExercise;
-
-    public PreviousExerciseFragment() {
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -55,7 +54,8 @@ public class PreviousExerciseFragment extends Fragment {
 
     private void loadTrainingScreen(View view) {
         if (checkedExercise != null) {
-            loadFragment(new TrainingFragment(checkedExercise));
+            TrainingFragment trainingFragment = new TrainingFragment(checkedExercise);
+            loadFragment(trainingFragment);
         }
     }
 
@@ -75,6 +75,7 @@ public class PreviousExerciseFragment extends Fragment {
 
             // Runs on the UI thread
             handler.post(() -> {
+
                 exercises.forEach(exercise -> {
                     RadioButton radioButton = new RadioButton(view.getContext());
                     String exerciseText = String.format("%s - %s reps", exercise.getName(), exercise.getReps());
@@ -85,6 +86,7 @@ public class PreviousExerciseFragment extends Fragment {
                             checkedExercise = exercise;
                         }
                     });
+
                     previousExercisesRadioGroup.addView(radioButton);
                 });
 
@@ -100,8 +102,11 @@ public class PreviousExerciseFragment extends Fragment {
     }
 
     void loadFragment(Fragment fragment) {
-        getParentFragmentManager().beginTransaction().replace(R.id.relativeLayout, fragment).addToBackStack(
-                fragment.getTag()).commit();
+        getParentFragmentManager()
+                .beginTransaction()
+                .replace(R.id.relativeLayout, fragment)
+                .addToBackStack(fragment.getTag())
+                .commit();
     }
 
 }
