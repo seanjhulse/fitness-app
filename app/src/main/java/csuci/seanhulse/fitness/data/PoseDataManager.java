@@ -3,8 +3,8 @@ package csuci.seanhulse.fitness.data;
 import com.google.mlkit.vision.pose.Pose;
 
 import java.util.Collection;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.Deque;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -15,11 +15,11 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class PoseDataManager {
     private final Collection<IPoseDataListener> listeners = new CopyOnWriteArrayList<>();
-    private final Queue<Pose> poses = new ConcurrentLinkedQueue<>();
+    private final Deque<Pose> poses = new ConcurrentLinkedDeque<>();
 
     public void addPose(Pose pose) {
         if (pose != null) {
-            poses.add(pose);
+            poses.addLast(pose);
 
             // Inform each listener that the Pose has been added
             listeners.forEach(listener -> listener.poseAdded(pose));
@@ -27,7 +27,7 @@ public class PoseDataManager {
     }
 
     public Pose getPose() {
-        return poses.peek();
+        return poses.getLast();
     }
 
     public void clear() {

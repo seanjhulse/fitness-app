@@ -56,7 +56,6 @@ public class TrainingFragment extends Fragment {
     public static final int INTERVAL_SEC = 2;
     @SuppressLint("SimpleDateFormat")
     private static final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mmZ");
-    private static final float IN_FRAME_LIKELIHOOD_VALUE = 0.90f;
     private static final Gson gson = new Gson();
     private final Exercise exercise;
     private final ProgressBarRunnable progressBarRunnable = new ProgressBarRunnable(new Handler());
@@ -172,6 +171,13 @@ public class TrainingFragment extends Fragment {
             final ColorStateList backgroundTint = ColorStateList.valueOf(backgroundColor);
             toggleTrainingButton.setBackgroundTintList(backgroundTint);
             toggleTrainingButton.setImageDrawable(stopIcon);
+
+            if (countDownTimer != null) {
+                countDownTimer.cancel();
+            }
+            if (progressBarRunnable.isRunning()) {
+                progressBarRunnable.cancel();
+            }
         }
     }
 
@@ -207,21 +213,23 @@ public class TrainingFragment extends Fragment {
 
             @Override
             public void onTick(long millisUntilFinished) {
-                countDownTimeMs = millisUntilFinished;
+                if (isTraining) {
+                    countDownTimeMs = millisUntilFinished;
 
-                repState = repState == RepState.UP ? RepState.DOWN : RepState.UP;
+                    repState = repState == RepState.UP ? RepState.DOWN : RepState.UP;
 
-                savePose(poseDataManager.getPose());
+                    savePose(poseDataManager.getPose());
 
-                progressText.setText(repState.toString());
+                    progressText.setText(repState.toString());
 
-                if (repState == RepState.UP) {
-                    trainingRepsText.setText(String.format("%s reps", numRepsRemaining));
-                    numRepsRemaining = numRepsRemaining - 1;
+                    if (repState == RepState.UP) {
+                        trainingRepsText.setText(String.format("%s reps", numRepsRemaining));
+                        numRepsRemaining = numRepsRemaining - 1;
+                    }
+
+                    progressBarRunnable.setDelay(INTERVAL_SEC);
+                    progressBarRunnable.start();
                 }
-
-                progressBarRunnable.setDelay(INTERVAL_SEC);
-                progressBarRunnable.start();
             }
 
             @Override
@@ -273,7 +281,6 @@ public class TrainingFragment extends Fragment {
     private List<Landmark> createDbLandmarkFromPose(List<PoseLandmark> poseLandmarks) {
         return poseLandmarks
                 .stream()
-                .filter(landmark -> landmark.getInFrameLikelihood() > IN_FRAME_LIKELIHOOD_VALUE)
                 .map(landmark -> {
                     PointF3D position = landmark.getPosition3D();
                     return new Landmark(position.getX(),
