@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    tools:context=".settings.SettingsFragment">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:shadowColor="#3C3C3C"
+        android:shadowDx="3"
+        android:shadowDy="3"
+        android:shadowRadius="9"
+        android:textAlignment="center"
+        android:textSize="28sp"
+        android:id="@+id/exerciseName" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:shadowColor="#3C3C3C"
+        android:shadowDx="3"
+        android:shadowDy="3"
+        android:shadowRadius="9"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        android:id="@+id/exerciseReps" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:shadowColor="#3C3C3C"
+        android:shadowDx="3"
+        android:shadowDy="3"
+        android:shadowRadius="9"
+        android:textAlignment="center"
+        android:textSize="14sp"
+        android:id="@+id/exerciseDatetime" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="25dp"
+        android:layout_marginTop="25dp"
+        android:layout_marginRight="25dp"
+        android:layout_marginBottom="25dp"
+        android:orientation="horizontal">
+
+        <RelativeLayout
+            android:id="@+id/workoutButtonWrapper"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_weight="1">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/workoutButton"
+                android:layout_width="150dp"
+                android:layout_height="100dp"
+                android:paddingBottom="20dp"
+                android:clickable="true"
+                android:layout_centerInParent="true"
+                app:rippleColor="@color/cardview_dark_background"
+                app:srcCompat="@drawable/sports_martial_arts" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@id/workoutButton"
+                android:gravity="center"
+                android:text="@string/workout_button_label" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/trainButtonWrapper"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_weight="1">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/trainButton"
+                android:layout_width="150dp"
+                android:layout_height="100dp"
+                android:paddingBottom="20dp"
+                android:clickable="true"
+                android:layout_centerInParent="true"
+                app:rippleColor="@color/cardview_dark_background"
+                app:srcCompat="@drawable/model_training" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@id/trainButton"
+                android:gravity="center"
+                android:text="Train ML Model" />
+        </RelativeLayout>
+
+    </LinearLayout>
+</LinearLayout>

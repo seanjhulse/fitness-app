@@ -22,8 +22,7 @@ import com.google.android.material.navigation.NavigationBarView;
 import csuci.seanhulse.fitness.camera.Analyzer;
 import csuci.seanhulse.fitness.camera.CameraManager;
 import csuci.seanhulse.fitness.data.PoseDataManager;
-import csuci.seanhulse.fitness.home.HomeFragment;
-import csuci.seanhulse.fitness.training.TrainingMenuFragment;
+import csuci.seanhulse.fitness.settings.SettingsFragment;
 import csuci.seanhulse.fitness.workouts.WorkoutsFragment;
 
 public class MainActivity extends AppCompatActivity implements NavigationBarView.OnItemSelectedListener {
@@ -39,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
         cameraManager = new CameraManager(this, getApplicationContext());
         cameraManager.setAnalyzer(new Analyzer(poseDataManager, true));
 
-        loadFragment(new HomeFragment());
+        loadFragment(new WorkoutsFragment());
 
         // Initialize Amplify for AWS S3 connection
         try {
@@ -68,14 +67,11 @@ public class MainActivity extends AppCompatActivity implements NavigationBarView
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         Fragment fragment = null;
         switch (item.getItemId()) {
-            case R.id.home:
-                fragment = new HomeFragment();
-                break;
             case R.id.workouts:
                 fragment = new WorkoutsFragment();
                 break;
-            case R.id.training:
-                fragment = new TrainingMenuFragment();
+            case R.id.settings:
+                fragment = new SettingsFragment();
                 break;
         }
         if (fragment != null) {

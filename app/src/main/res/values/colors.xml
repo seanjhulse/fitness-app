@@ -9,6 +9,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="colorPrimary">#AC0F0F</color>
     <color name="colorPrimaryVariant">#AC0F0F</color>
+    <color name="colorPrimaryBackground">#FF652929</color>
     <color name="colorOnPrimary">@color/design_default_color_on_primary</color>
     <!-- Secondary brand color. -->
     <color name="colorSecondary">@color/design_default_color_secondary</color>
