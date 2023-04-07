@@ -1,5 +1,6 @@
 package csuci.seanhulse.fitness.workouts;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,7 @@ import androidx.appcompat.widget.AppCompatImageView;
 import androidx.fragment.app.Fragment;
 
 import csuci.seanhulse.fitness.R;
+import csuci.seanhulse.fitness.api.MachineLearningApiHandler;
 import csuci.seanhulse.fitness.db.Exercise;
 import csuci.seanhulse.fitness.training.TrainingFragment;
 import csuci.seanhulse.fitness.utility.DatetimeFormatter;
@@ -20,6 +22,7 @@ import csuci.seanhulse.fitness.utility.DatetimeFormatter;
  */
 public class ExerciseFragment extends Fragment {
     private final Exercise exercise;
+    private MachineLearningApiHandler machineLearningApiHandler;
 
     public ExerciseFragment(Exercise exercise) {
         this.exercise = exercise;
@@ -35,6 +38,8 @@ public class ExerciseFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_exercise, container, false);
+        Context context = view.getContext();
+        machineLearningApiHandler = new MachineLearningApiHandler(context);
         setupExerciseTitle(view);
 
         AppCompatImageView trainingButton = view.findViewById(R.id.trainButton);
@@ -42,7 +47,15 @@ public class ExerciseFragment extends Fragment {
 
         AppCompatImageView workoutButton = view.findViewById(R.id.workoutButton);
         workoutButton.setOnClickListener(this::startWorkout);
+
+        AppCompatImageView buildMlModelButton = view.findViewById(R.id.buildMlModelButton);
+        buildMlModelButton.setOnClickListener(this::triggerModelBuild);
+
         return view;
+    }
+
+    private void triggerModelBuild(View view) {
+        machineLearningApiHandler.httpGetHome(view.getContext());
     }
 
     private void startWorkout(View view) {
