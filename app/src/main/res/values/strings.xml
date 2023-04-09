@@ -34,4 +34,7 @@
     <string name="workout_button_label">Workout</string>
     <string name="train_ml_model_button_label">Train ML Model</string>
     <string name="build_ml_model_button_label">Build ML Model</string>
+    <string name="disabled_ml_model_message">Train your ML model</string>
+    <string
+        name="workout_disabled_message">Build your ML model (or train one)</string>
 </resources>

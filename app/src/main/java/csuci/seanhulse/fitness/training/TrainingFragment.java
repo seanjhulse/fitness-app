@@ -37,6 +37,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import csuci.seanhulse.fitness.MainActivity;
@@ -302,7 +303,7 @@ public class TrainingFragment extends Fragment {
 
         try {
             String exerciseName = exercise.getName().toLowerCase();
-            long exerciseId = exercise.getId();
+            UUID exerciseId = exercise.getId();
             String fileName = String.format("%s-%s/%s.json", exerciseName, exerciseId, pose.getId());
 
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));

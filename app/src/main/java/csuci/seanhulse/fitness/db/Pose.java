@@ -7,6 +7,7 @@ import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import java.util.List;
+import java.util.UUID;
 
 @Entity(
         foreignKeys = {
@@ -23,7 +24,7 @@ public class Pose {
     private long id;
 
     @ColumnInfo(name = "exercise_id")
-    public long exerciseId;
+    public UUID exerciseId;
 
     @ColumnInfo(name = "datetime")
     private String datetime;
@@ -39,7 +40,7 @@ public class Pose {
 
     }
 
-    public Pose(List<Landmark> landmarks, String datetime, String state, long exerciseId) {
+    public Pose(List<Landmark> landmarks, String datetime, String state, UUID exerciseId) {
         this.landmarks = landmarks;
         this.datetime = datetime;
         this.state = state;
@@ -54,7 +55,7 @@ public class Pose {
         return datetime;
     }
 
-    public long getExerciseId() {
+    public UUID getExerciseId() {
         return exerciseId;
     }
 
