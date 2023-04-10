@@ -1,5 +1,7 @@
 package csuci.seanhulse.fitness.data;
 
+import androidx.annotation.Nullable;
+
 import com.google.mlkit.vision.pose.Pose;
 
 import java.util.Collection;
@@ -26,8 +28,14 @@ public class PoseDataManager {
         }
     }
 
+    @Nullable
     public Pose getPose() {
-        return poses.getLast();
+        if (!poses.isEmpty())
+        {
+            return poses.getLast();
+        }
+
+        return null;
     }
 
     public void clear() {

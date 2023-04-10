@@ -219,7 +219,10 @@ public class TrainingFragment extends Fragment {
 
                     repState = repState == RepState.UP ? RepState.DOWN : RepState.UP;
 
-                    savePose(poseDataManager.getPose());
+                    Pose pose = poseDataManager.getPose();
+                    if (pose != null) {
+                        savePose(pose);
+                    }
 
                     progressText.setText(repState.toString());
 
