@@ -3,6 +3,7 @@ package csuci.seanhulse.fitness.workouts;
 import static com.google.android.material.R.id.snackbar_text;
 import static com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG;
 import static csuci.seanhulse.fitness.api.TaskState.Status.FAILURE;
+import static csuci.seanhulse.fitness.api.TaskState.Status.PENDING;
 import static csuci.seanhulse.fitness.api.TaskState.Status.SUCCESS;
 
 import android.annotation.SuppressLint;
@@ -29,7 +30,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import csuci.seanhulse.fitness.R;
 import csuci.seanhulse.fitness.api.IApiListener;
@@ -37,7 +37,6 @@ import csuci.seanhulse.fitness.api.MachineLearningApiHandler;
 import csuci.seanhulse.fitness.api.TaskState.Status;
 import csuci.seanhulse.fitness.db.Exercise;
 import csuci.seanhulse.fitness.db.Model;
-import csuci.seanhulse.fitness.db.ModelDao;
 import csuci.seanhulse.fitness.db.Pose;
 import csuci.seanhulse.fitness.db.PoseDatabase;
 import csuci.seanhulse.fitness.training.TrainingFragment;
@@ -105,14 +104,12 @@ public class ExerciseFragment extends Fragment implements IApiListener {
 
         Handler handler = new Handler();
         AsyncTask.execute(() -> {
-            UUID exerciseId = exercise.getId();
-
-            List<Model> mlModels = db.modelDao().findAll(exerciseId);
-            // Disable the workout button until we have successfully built an ML model for this exercise
-            handler.post(() -> workoutButton.setEnabled(mlModels.size() > 0));
-
-            List<Pose> poses = db.poseDao().findAll(exerciseId);
-            handler.post(() -> buildMlModelButton.setEnabled(poses.size() > MINIMUM_REQUIRED_POSES));
+            List<Model> mlModels = db.modelDao().findAll(exercise.getId());
+            List<Pose> poses = db.poseDao().findAll(exercise.getId());
+            handler.post(() -> {
+                workoutButton.setEnabled(mlModels.size() > 0);
+                buildMlModelButton.setEnabled(poses.size() > MINIMUM_REQUIRED_POSES);
+            });
         });
 
         this.coordinatorLayout = view.findViewById(R.id.exerciseCoordinatorLayout);
@@ -194,8 +191,7 @@ public class ExerciseFragment extends Fragment implements IApiListener {
 
                 model.setExerciseId(exercise.getId());
 
-                ModelDao modelDao = db.modelDao();
-                modelDao.insert(model);
+                db.modelDao().insert(model);
             });
         }
     }
@@ -206,23 +202,28 @@ public class ExerciseFragment extends Fragment implements IApiListener {
         Status status = Status.valueOf(task.get("status").getAsString());
         String id = task.get("id").getAsString();
 
-        AsyncTask.execute(() -> {
-            Optional<Model> modelOptional = db.modelDao().loadAll()
-                    .stream()
-                    .filter(model -> model.getTaskId().equals(id))
-                    .findFirst();
-            if (modelOptional.isPresent()) {
-                Model model = modelOptional.get();
-                model.setStatus(status.toString());
+        if (status.equals(PENDING)) {
+            machineLearningApiHandler.httpGetTaskResults(id);
+        } else {
+            AsyncTask.execute(() -> {
+                Optional<Model> modelOptional = db.modelDao().loadAll()
+                        .stream()
+                        .filter(model -> model.getTaskId().equals(id))
+                        .findFirst();
+                if (modelOptional.isPresent()) {
+                    Model model = modelOptional.get();
+                    db.modelDao().updateStatus(status, model.getId());
+                }
+            });
+
+            if (status.equals(SUCCESS)) {
+                Log.i(ExerciseFragment.class.getName(), "Task was successful");
+                workoutButton.setEnabled(true);
+
+            } else if (status.equals(FAILURE)) {
+                Log.i(ExerciseFragment.class.getName(), "Task was unsuccessful");
             }
-        });
-
-        if (status.equals(SUCCESS)) {
-            Log.i(ExerciseFragment.class.getName(), "Task was successful");
-            workoutButton.setEnabled(true);
-
-        } else if (status.equals(FAILURE)) {
-            Log.i(ExerciseFragment.class.getName(), "Task was unsuccessful");
         }
+
     }
 }

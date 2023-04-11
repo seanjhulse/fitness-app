@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Workout Assistant</string>
+    <string name="app_name">FitAi Personal Assistant</string>
     <string name="exerciseNameHint">Name</string>
     <string name="submit">Submit</string>
     <string name="cancel">Cancel</string>

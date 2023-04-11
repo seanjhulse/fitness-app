@@ -217,12 +217,12 @@ public class TrainingFragment extends Fragment {
                 if (isTraining) {
                     countDownTimeMs = millisUntilFinished;
 
-                    repState = repState == RepState.UP ? RepState.DOWN : RepState.UP;
-
                     Pose pose = poseDataManager.getPose();
                     if (pose != null) {
-                        savePose(pose);
+                        savePose(pose, repState.toString());
                     }
+
+                    repState = repState == RepState.UP ? RepState.DOWN : RepState.UP;
 
                     progressText.setText(repState.toString());
 
@@ -249,16 +249,17 @@ public class TrainingFragment extends Fragment {
     /**
      * Saves the provided {@link Pose} to the database.
      *
-     * @param mlPose {@link Pose} the ML pose created by Google's ML Kit
+     * @param mlPose   {@link Pose} the ML pose created by Google's ML Kit
+     * @param repState the {@link RepState} for this pose
      */
-    private void savePose(Pose mlPose) {
+    private void savePose(Pose mlPose, String repState) {
         AsyncTask.execute(() -> {
             List<Landmark> landmarks = createDbLandmarkFromPose(mlPose.getAllPoseLandmarks());
 
             csuci.seanhulse.fitness.db.Pose pose = new csuci.seanhulse.fitness.db.Pose(
                     landmarks,
                     df.format(new Date()),
-                    repState.toString(),
+                    repState,
                     exercise.getId()
             );
 
