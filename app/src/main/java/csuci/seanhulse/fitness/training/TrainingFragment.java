@@ -74,7 +74,7 @@ public class TrainingFragment extends Fragment {
     private PoseDatabase db;
     private Context context;
 
-    private enum RepState {UP, DOWN}
+    public enum RepState {UP, DOWN}
 
     public TrainingFragment(Exercise exercise) {
         this.exercise = exercise;

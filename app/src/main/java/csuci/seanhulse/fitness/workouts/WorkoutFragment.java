@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.camera.view.PreviewView;
 import androidx.fragment.app.Fragment;
@@ -26,6 +27,7 @@ import csuci.seanhulse.fitness.data.IPoseDataListener;
 import csuci.seanhulse.fitness.data.PoseDataManager;
 import csuci.seanhulse.fitness.db.Exercise;
 import csuci.seanhulse.fitness.skeleton.Skeleton;
+import csuci.seanhulse.fitness.training.TrainingFragment.RepState;
 
 /**
  * A fragment for conducting a workout. This fragment is responsible for receiving pose data from a
@@ -55,6 +57,9 @@ public class WorkoutFragment extends Fragment implements IApiListener, IPoseData
      */
     private final Exercise exercise;
 
+    private int numberOfReps = 0;
+    private RepState repState = RepState.UP;
+
     /**
      * The {@link PoseDataManager} responsible for providing pose data for the workout.
      */
@@ -81,6 +86,8 @@ public class WorkoutFragment extends Fragment implements IApiListener, IPoseData
      * The camera preview view.
      */
     private PreviewView cameraSurface;
+    private TextView predictionText;
+    private TextView numRepsText;
 
     /**
      * Constructs a new {@link WorkoutFragment} with the given exercise.
@@ -119,6 +126,8 @@ public class WorkoutFragment extends Fragment implements IApiListener, IPoseData
         this.poseDataManager = activity.getPoseDataManager();
         this.skeleton = view.findViewById(R.id.skeleton);
         this.cameraSurface = view.findViewById(R.id.cameraSurface);
+        this.predictionText = view.findViewById(R.id.predictionText);
+        this.numRepsText = view.findViewById(R.id.numRepsText);
 
         poseDataManager.addPoseDataListener(skeleton);
 
@@ -189,15 +198,39 @@ public class WorkoutFragment extends Fragment implements IApiListener, IPoseData
                 case "MODEL_LOAD":
                     handleModelLoadResponse();
                     break;
-                case "MODEL_PREDICT":
-                    // TODO: HANDLE MODEL PREDICTION BY DISPLAYING IT ON THE FRAGMENT
-
+                case "TASK_RESULT":
                     // We are not predicting anymore because we are handling a response
                     IS_CURRENTLY_PREDICTING.getAndSet(false);
-
+                    setRepStateBasedOnMLPrediction(jsonObject);
                     break;
             }
         }
+    }
+
+    /**
+     * Sets the text of the {@link RepState} prediction and number of reps element based on the API JSON response.
+     *
+     * @param jsonResponse The JSON response containing the ML model prediction data to display.
+     */
+    public void setRepStateBasedOnMLPrediction(JsonObject jsonResponse) {
+        // Get the data object from the JSON response
+        JsonObject data = jsonResponse.getAsJsonObject("data");
+
+        // Get the median values as uppercase strings (or server does some analytics to make handling the predicted
+        // avg value easier).
+        String median = data.get("median").getAsString().toUpperCase();
+
+        // If the previous rep state was "down" and the current new state is "up", we have completed a rep
+        if (repState.equals(RepState.DOWN) && median.equalsIgnoreCase(RepState.UP.name())) {
+            numberOfReps = numberOfReps + 1;
+            numRepsText.setText(String.format("%s reps", numberOfReps));
+        }
+
+        // Convert the current rep state based on the server's prediction
+        repState = RepState.valueOf(median);
+
+        // Set the text of the TextViews
+        predictionText.setText(repState.toString());
     }
 
 
@@ -229,6 +262,9 @@ public class WorkoutFragment extends Fragment implements IApiListener, IPoseData
 
         // If the buffer is large enough, process the buffer
         if (poseBuffer.size() >= BUFFER_PROCESS_LIMIT) {
+
+            // We don't want to send a request until we've already handled the previous response to avoid spamming
+            // our server and clogging up our request/response cycle
             if (!IS_CURRENTLY_PREDICTING.getAndSet(true)) {
                 // Predict the provided poses
                 machineLearningApiHandler.httpPostPredict(exercise, poseBuffer);
