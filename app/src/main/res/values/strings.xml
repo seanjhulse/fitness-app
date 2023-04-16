@@ -37,4 +37,5 @@
     <string name="disabled_ml_model_message">Train your ML model</string>
     <string
         name="workout_disabled_message">Build your ML model (or train one)</string>
+    <string name="no_pose_detected">NO POSE DETECTED</string>
 </resources>

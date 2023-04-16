@@ -37,7 +37,7 @@ import csuci.seanhulse.fitness.db.Landmark;
  */
 public class MachineLearningApiHandler {
     private static final String BUCKET = "poses105121-dev";
-    private static final String BASE_URL = "http://10.38.1.202:5000";
+    private static final String BASE_URL = "http://192.168.24.115:5000";
     private static final long BACKOFF_TIMEOUT_MS = 10_000;
     private static final int BACKOFF_RETRIES = 20;
     private static final Gson gson = new Gson();
@@ -284,13 +284,14 @@ public class MachineLearningApiHandler {
         exerciseJson.addProperty("prefix", prefix);
         exerciseJson.add("poses", new JsonArray());
 
+        Log.d(MachineLearningApiHandler.class.getName(), String.format("Running prediction for pose for %s/%s/%s",
+                BUCKET, prefix, name));
+        
         for (Pose pose : poses) {
             List<Landmark> landmarks = createDbLandmarkFromPose(pose.getAllPoseLandmarks());
             JsonObject landmarksElement = new JsonObject();
             landmarksElement.add("landmarks", convertLandmarksToJson(landmarks));
             exerciseJson.getAsJsonArray("poses").add(landmarksElement);
-            Log.d(MachineLearningApiHandler.class.getName(), String.format("Running prediction for pose for %s/%s/%s",
-                    BUCKET, prefix, name));
         }
 
         return exerciseJson.toString();
