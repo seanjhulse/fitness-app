@@ -156,8 +156,8 @@ public class MachineLearningApiHandler {
         queue.add(loadModelRequest);
     }
 
-    public void httpPostPredict(Exercise exercise, Pose pose) {
-        String body = convertPoseToPredictionFormat(exercise, pose);
+    public void httpPostPredict(Exercise exercise, Collection<Pose> poses) {
+        String body = convertPoseToPredictionFormat(exercise, poses);
         String url = buildUrl("model/predict");
 
         Request<JsonObject> predictionRequest = new JsonRequest<>(Request.Method.POST, url, body,
@@ -273,24 +273,25 @@ public class MachineLearningApiHandler {
         return mlModelJson.toString();
     }
 
-    private String convertPoseToPredictionFormat(Exercise exercise, Pose pose) {
+    private String convertPoseToPredictionFormat(Exercise exercise, Collection<Pose> poses) {
         String name = exercise.getName();
-
-        List<Landmark> landmarks = createDbLandmarkFromPose(pose.getAllPoseLandmarks());
-
-        String prefix = String.format("public/%s-%s", name.toLowerCase(), exercise.getId());
 
         JsonObject exerciseJson = new JsonObject();
         exerciseJson.addProperty("bucket", BUCKET);
-        exerciseJson.addProperty("prefix", prefix);
         exerciseJson.addProperty("name", String.format("%s-%s", name.toLowerCase(), exercise.getId()));
 
-        JsonObject landmarksElement = new JsonObject();
-        landmarksElement.add("landmarks", convertLandmarksToJson(landmarks));
-        exerciseJson.add("pose", landmarksElement);
+        String prefix = String.format("public/%s-%s", name.toLowerCase(), exercise.getId());
+        exerciseJson.addProperty("prefix", prefix);
+        exerciseJson.add("poses", new JsonArray());
 
-        Log.i(MachineLearningApiHandler.class.getName(), String.format("Running prediction for pose for %s/%s/%s",
-                BUCKET, prefix, name));
+        for (Pose pose : poses) {
+            List<Landmark> landmarks = createDbLandmarkFromPose(pose.getAllPoseLandmarks());
+            JsonObject landmarksElement = new JsonObject();
+            landmarksElement.add("landmarks", convertLandmarksToJson(landmarks));
+            exerciseJson.getAsJsonArray("poses").add(landmarksElement);
+            Log.d(MachineLearningApiHandler.class.getName(), String.format("Running prediction for pose for %s/%s/%s",
+                    BUCKET, prefix, name));
+        }
 
         return exerciseJson.toString();
     }

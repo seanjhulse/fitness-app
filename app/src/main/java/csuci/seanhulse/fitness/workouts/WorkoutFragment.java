@@ -13,6 +13,8 @@ import androidx.fragment.app.Fragment;
 import com.google.gson.JsonObject;
 import com.google.mlkit.vision.pose.Pose;
 
+import java.util.Collection;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import csuci.seanhulse.fitness.MainActivity;
@@ -31,6 +33,8 @@ import csuci.seanhulse.fitness.skeleton.Skeleton;
  */
 public class WorkoutFragment extends Fragment implements IApiListener, IPoseDataListener {
     private static final AtomicBoolean IS_CURRENTLY_PREDICTING = new AtomicBoolean(false);
+    public static final int BUFFER_PROCESS_LIMIT = 20;
+    private final Collection<Pose> poseBuffer = new CopyOnWriteArraySet<>();
     private final Exercise exercise;
     private PoseDataManager poseDataManager;
     private Skeleton skeleton;
@@ -101,25 +105,43 @@ public class WorkoutFragment extends Fragment implements IApiListener, IPoseData
         Log.d(WorkoutFragment.class.getName(), jsonObject.toString());
 
         JsonObject task = jsonObject.getAsJsonObject("task");
-        if (task.get("status").getAsString().equals("PENDING")) {
+        String taskStatus = task.get("status").getAsString();
+        String taskType = task.get("type").getAsString();
+
+        // If the task is pending, just keep checking until it succeeds or fails
+        if (taskStatus.equals("PENDING")) {
             String id = task.get("id").getAsString();
             machineLearningApiHandler.httpGetTaskResults(id);
-        } else {
-            poseDataManager.addPoseDataListener(this);
+        } else if (taskStatus.equals("SUCCESS")) {
+            switch (taskType) {
+                case "MODEL_LOAD":
+                    poseDataManager.addPoseDataListener(this);
 
-            MainActivity activity = (MainActivity) context;
-            CameraManager cameraManager = activity.getCameraManager();
-            cameraManager.start(cameraSurface);
+                    MainActivity activity = (MainActivity) context;
+                    CameraManager cameraManager = activity.getCameraManager();
+                    cameraManager.start(cameraSurface);
 
-            IS_CURRENTLY_PREDICTING.getAndSet(false);
+                    IS_CURRENTLY_PREDICTING.getAndSet(false);
+                    break;
+                case "MODEL_PREDICT":
+                    // TODO: HANDLE MODEL PREDICTION BY DISPLAYING IT ON THE FRAGMENT
+                    break;
+            }
         }
     }
 
     @Override
     public void poseAdded(Pose pose) {
-        if (!IS_CURRENTLY_PREDICTING.getAndSet(true)) {
-            // Predict the provided pose
-            machineLearningApiHandler.httpPostPredict(exercise, pose);
+        // Buffer the pose we've analyzed
+        poseBuffer.add(pose);
+
+        // If the buffer is large enough, process the buffer
+        if (poseBuffer.size() >= BUFFER_PROCESS_LIMIT) {
+            if (!IS_CURRENTLY_PREDICTING.getAndSet(true)) {
+                // Predict the provided poses
+                machineLearningApiHandler.httpPostPredict(exercise, poseBuffer);
+                poseBuffer.clear();
+            }
         }
     }
 
