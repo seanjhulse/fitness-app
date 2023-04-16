@@ -28,20 +28,65 @@ import csuci.seanhulse.fitness.db.Exercise;
 import csuci.seanhulse.fitness.skeleton.Skeleton;
 
 /**
- * A simple {@link Fragment} subclass. Use the {@link WorkoutFragment} factory method to create an instance of this
- * fragment.
+ * A fragment for conducting a workout. This fragment is responsible for receiving pose data from a
+ * {@link PoseDataManager}, rendering the detected pose onto a {@link Skeleton}, and sending the pose data to a machine
+ * learning model for prediction
+ * <p>
+ * via a {@link MachineLearningApiHandler}.
  */
 public class WorkoutFragment extends Fragment implements IApiListener, IPoseDataListener {
+    /**
+     * Atomic boolean indicating whether the fragment is currently processing a prediction request.
+     */
     private static final AtomicBoolean IS_CURRENTLY_PREDICTING = new AtomicBoolean(false);
+
+    /**
+     * The maximum number of poses to buffer before processing a prediction request.
+     */
     public static final int BUFFER_PROCESS_LIMIT = 20;
+
+    /**
+     * The maximum number of poses to buffer before processing a prediction request.
+     */
     private final Collection<Pose> poseBuffer = new CopyOnWriteArraySet<>();
+
+    /**
+     * The exercise for this workout.
+     */
     private final Exercise exercise;
+
+    /**
+     * The {@link PoseDataManager} responsible for providing pose data for the workout.
+     */
     private PoseDataManager poseDataManager;
+
+    /**
+     * The {@link Skeleton} responsible for rendering detected poses.
+     */
     private Skeleton skeleton;
+
+    /**
+     * The {@link MachineLearningApiHandler} responsible for sending pose data to a machine learning model for
+     * prediction.
+     */
+
     private MachineLearningApiHandler machineLearningApiHandler;
+
+    /**
+     * The context of this fragment.
+     */
     private Context context;
+
+    /**
+     * The camera preview view.
+     */
     private PreviewView cameraSurface;
 
+    /**
+     * Constructs a new {@link WorkoutFragment} with the given exercise.
+     *
+     * @param exercise The exercise for this workout.
+     */
     public WorkoutFragment(Exercise exercise) {
         this.exercise = exercise;
     }
@@ -51,6 +96,14 @@ public class WorkoutFragment extends Fragment implements IApiListener, IPoseData
         super.onCreate(savedInstanceState);
     }
 
+    /**
+     * Called when the fragment is creating its view.
+     *
+     * @param inflater           The layout inflater used to inflate the fragment layout.
+     * @param container          The parent view group.
+     * @param savedInstanceState The saved instance state of the fragment.
+     * @return The inflated view of the fragment.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -75,6 +128,9 @@ public class WorkoutFragment extends Fragment implements IApiListener, IPoseData
         return view;
     }
 
+    /**
+     * Called when the fragment is being destroyed.
+     */
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -82,6 +138,11 @@ public class WorkoutFragment extends Fragment implements IApiListener, IPoseData
         machineLearningApiHandler.removeListener(this);
     }
 
+    /**
+     * Loads the given fragment into the parent fragment manager.
+     *
+     * @param fragment The fragment to load.
+     */
     private void loadFragment(Fragment fragment) {
         getParentFragmentManager()
                 .beginTransaction()
@@ -90,6 +151,11 @@ public class WorkoutFragment extends Fragment implements IApiListener, IPoseData
                 .commit();
     }
 
+    /**
+     * Called when a task creation response is received from the {@link MachineLearningApiHandler}.
+     *
+     * @param jsonObject The JSON object representing the response.
+     */
     @Override
     public void handleTaskCreationResponse(JsonObject jsonObject) {
         JsonObject task = jsonObject.getAsJsonObject("task");
@@ -100,6 +166,12 @@ public class WorkoutFragment extends Fragment implements IApiListener, IPoseData
         }
     }
 
+    /**
+     * This method handles the response from the server after sending a task to the server and performs the necessary
+     * actions based on the status of the task.
+     *
+     * @param jsonObject the JSON response from the server
+     */
     @Override
     public void handleTaskResultsResponse(JsonObject jsonObject) {
         Log.d(WorkoutFragment.class.getName(), jsonObject.toString());
@@ -115,21 +187,41 @@ public class WorkoutFragment extends Fragment implements IApiListener, IPoseData
         } else if (taskStatus.equals("SUCCESS")) {
             switch (taskType) {
                 case "MODEL_LOAD":
-                    poseDataManager.addPoseDataListener(this);
-
-                    MainActivity activity = (MainActivity) context;
-                    CameraManager cameraManager = activity.getCameraManager();
-                    cameraManager.start(cameraSurface);
-
-                    IS_CURRENTLY_PREDICTING.getAndSet(false);
+                    handleModelLoadResponse();
                     break;
                 case "MODEL_PREDICT":
                     // TODO: HANDLE MODEL PREDICTION BY DISPLAYING IT ON THE FRAGMENT
+
+                    // We are not predicting anymore because we are handling a response
+                    IS_CURRENTLY_PREDICTING.getAndSet(false);
+
                     break;
             }
         }
     }
 
+
+    /**
+     * Handles the response after successfully loading the model. This method adds a listener to the PoseDataManager and
+     * starts the camera. It also sets the IS_CURRENTLY_PREDICTING flag to false since we are not predicting after
+     * initially loading the model.
+     */
+    private void handleModelLoadResponse() {
+        poseDataManager.addPoseDataListener(this);
+
+        MainActivity activity = (MainActivity) context;
+        CameraManager cameraManager = activity.getCameraManager();
+        cameraManager.start(cameraSurface);
+
+        IS_CURRENTLY_PREDICTING.getAndSet(false);
+    }
+
+    /**
+     * This method is called when a new Pose is added to the pose data manager's list of poses. It provides the added
+     * pose as an argument to the method for further processing.
+     *
+     * @param pose The Pose object that was added to the pose data manager.
+     */
     @Override
     public void poseAdded(Pose pose) {
         // Buffer the pose we've analyzed
